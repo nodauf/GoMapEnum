@@ -1,0 +1,29 @@
+package azure
+
+import (
+	"GoMapEnum/src/utils"
+)
+
+type Options struct {
+	utils.BaseOptions
+}
+
+type azureResponse struct {
+	Body struct {
+		Fault struct {
+			Detail struct {
+				Text  string `xml:",chardata"`
+				Error struct {
+					Text          string `xml:",chardata"`
+					Psf           string `xml:"psf,attr"`
+					Value         string `xml:"value"`
+					Internalerror struct {
+						Chardata string `xml:",chardata"`
+						Code     string `xml:"code"`
+						Text     string `xml:"text"`
+					} `xml:"internalerror"`
+				} `xml:"error"`
+			} `xml:"Detail"`
+		} `xml:"Fault"`
+	} `xml:"Body"`
+}

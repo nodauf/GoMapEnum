@@ -1,0 +1,13 @@
+builds:
+  - goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+archives:
+  -
+    format_overrides:
+      - goos: windows
+        format: zip
