@@ -14,11 +14,16 @@ import (
 	"sync"
 )
 
+// URL_PRESENCE_TEAMS is the URL the get additional information on a user
 var URL_PRESENCE_TEAMS = "https://presence.teams.microsoft.com/v1/presence/getpresence/"
+
+// URL_TEAMS is the URL to search email addresses
 var URL_TEAMS = "https://teams.microsoft.com/api/mt/emea/beta/users/%s/externalsearchv3"
+
+// CLIENT_VERSION is the header which is sent for API requests
 var CLIENT_VERSION = "27/1.0.0.2021011237"
 
-// UserEnum: Return a valid list of users according the provided options
+// UserEnum return a valid list of users according the provided options
 func (options *Options) UserEnum(logArg *logger.Logger) []string {
 	log = logArg
 	mux := &sync.Mutex{}
