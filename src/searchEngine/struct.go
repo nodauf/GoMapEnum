@@ -1,4 +1,4 @@
-package searchEngine
+package searchengine
 
 import (
 	"GoMapEnum/src/logger"
@@ -7,6 +7,7 @@ import (
 
 var log *logger.Logger
 
+// Options for searchengine module
 type Options struct {
 	Format     string
 	ExactMatch bool

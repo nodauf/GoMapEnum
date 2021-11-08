@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-// UserEnum: Return a valid list of users according the provided options
+// UserEnum return a valid list of users according the provided options
 func (options *Options) UserEnum() []string {
 	mux := &sync.Mutex{}
 	options.Users = utils.GetStringOrFile(options.Users)
@@ -25,9 +25,9 @@ func (options *Options) UserEnum() []string {
 				if !options.validTenant(domain) {
 					options.Log.Error("Tenant " + domain + " is not valid")
 					return
-				} else {
-					options.Log.Verbose("Tenant " + domain + " is valid")
 				}
+				options.Log.Verbose("Tenant " + domain + " is valid")
+
 				switch options.Mode {
 				case "office":
 					if options.enumOffice(email) {

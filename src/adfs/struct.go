@@ -7,6 +7,7 @@ import (
 
 var log *logger.Logger
 
+// Options for owa module
 type Options struct {
 	Domain string
 	utils.BaseOptions

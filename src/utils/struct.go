@@ -22,4 +22,5 @@ type BaseOptions struct {
 	Proxy            func(*http.Request) (*url.URL, error)
 }
 
+// ErrLockout is the error to returned when an account is locked
 var ErrLockout = errors.New("account is locked")

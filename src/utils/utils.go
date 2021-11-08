@@ -84,8 +84,8 @@ func GetUserAgent() string {
 	return userAgents[rand.Intn(len(userAgents))]
 }
 
-// Credits: https://stackoverflow.com/a/46202939/7245054
 // ReSubMatchMap will applied a regex with named capture and return a map
+// Credits: https://stackoverflow.com/a/46202939/7245054
 func ReSubMatchMap(r *regexp.Regexp, str string) map[string]string {
 	matches := r.FindAllStringSubmatch(str, -1)
 

@@ -13,9 +13,16 @@ import (
 	"strings"
 )
 
+// OFFICE_URL is used to get parameter for office user enumeration
 var OFFICE_URL = "https://www.office.com"
+
+// MICROSOFT_ONLINE_URL is the URL to performed user enumeration
 var MICROSOFT_ONLINE_URL = "https://login.microsoftonline.com/common/GetCredentialType?mkt=en-US"
+
+// VALIDATE_TENANT_URL is the url to validate if a tenant exist or not
 var VALIDATE_TENANT_URL = "https://login.microsoftonline.com/getuserrealm.srf?login=user@%s&xml=1"
+
+// OAUTH2_URL is the URL to authenticate with oauth2 method
 var OAUTH2_URL = "https://login.microsoft.com/common/oauth2/token"
 
 // enumOffice return a bool if the user exist or not

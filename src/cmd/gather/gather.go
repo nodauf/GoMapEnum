@@ -35,7 +35,7 @@ var users []string
 var output string
 var proxyString string
 
-// gatherCmd represents the gather command
+// GatherCmd represents the gather command
 var GatherCmd = &cobra.Command{
 	Use:   "gather",
 	Short: "Retrieve a list of email address based on the company name",

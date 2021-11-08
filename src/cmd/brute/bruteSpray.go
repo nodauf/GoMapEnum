@@ -34,7 +34,7 @@ var proxy func(*http.Request) (*url.URL, error)
 
 var proxyString string
 
-// bruteSprayCmd represents the bruteSpray command
+// BruteSprayCmd represents the bruteSpray command
 var BruteSprayCmd = &cobra.Command{
 	Use:   "bruteSpray",
 	Short: "Spray a password or bruteforce a user's password",

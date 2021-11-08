@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// UserEnum: Return a valid list of users according the provided options
+// UserEnum return a valid list of users according the provided options
 func (options *Options) UserEnum() []string {
 	log = options.Log
 

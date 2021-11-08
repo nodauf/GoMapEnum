@@ -4,6 +4,7 @@ import (
 	"GoMapEnum/src/utils"
 )
 
+// Options for Azure module
 type Options struct {
 	utils.BaseOptions
 }

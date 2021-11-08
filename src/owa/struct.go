@@ -8,6 +8,7 @@ import (
 
 var log *logger.Logger
 
+// Options for owa module
 type Options struct {
 	tr *http.Transport
 	utils.BaseOptions

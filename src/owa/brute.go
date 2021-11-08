@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// Brute will bruteforce or spray passwords on the specified users.
 func (options *Options) Brute() {
 	log = options.Log
 	var emailList []string

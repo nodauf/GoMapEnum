@@ -7,6 +7,7 @@ import (
 
 var log *logger.Logger
 
+// Options for teams module
 type Options struct {
 	Email  string
 	Token  string

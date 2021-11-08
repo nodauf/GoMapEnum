@@ -7,6 +7,7 @@ import (
 
 var log *logger.Logger
 
+// Options for o365 module
 type Options struct {
 	Format     string
 	ExactMatch bool

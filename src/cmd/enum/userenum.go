@@ -21,7 +21,7 @@ var proxy func(*http.Request) (*url.URL, error)
 
 var proxyString string
 
-// userenumCmd represents the userenum command
+// UserenumCmd represents the userenum command
 var UserenumCmd = &cobra.Command{
 	Use:   "userenum",
 	Short: "User enumeration",

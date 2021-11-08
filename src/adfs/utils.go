@@ -12,7 +12,10 @@ import (
 	"strings"
 )
 
+// FIND_ADFS_URL is the URL used to find the URL of an ADFS instance based on company hostname
 var FIND_ADFS_URL = "https://login.microsoftonline.com/getuserrealm.srf?login=%s"
+
+// ADFS_URL is the endpoint to authenticate on
 var ADFS_URL = "https://%s/adfs/ls/idpinitiatedsignon.aspx?client-request-id=%s&pullStatus=0"
 
 func (options *Options) brute(username, password string) bool {

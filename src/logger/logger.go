@@ -6,6 +6,7 @@ import (
 	"github.com/fatih/color"
 )
 
+// Level is a type representing the logging level
 type Level int
 
 const (
@@ -17,6 +18,7 @@ const (
 	DebugLevel
 )
 
+// Logger is the options for the logging module
 type Logger struct {
 	Level  Level
 	Module string
@@ -24,6 +26,7 @@ type Logger struct {
 	Type   string
 }
 
+// New create a Logger object for the specified arguments
 func New(kind, module, target string) *Logger {
 	log := &Logger{}
 	// If not set during the init of logger

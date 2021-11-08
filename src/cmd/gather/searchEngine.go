@@ -17,12 +17,12 @@ package gather
 
 import (
 	"GoMapEnum/src/logger"
-	"GoMapEnum/src/searchEngine"
+	searchengine "GoMapEnum/src/searchEngine"
 
 	"github.com/spf13/cobra"
 )
 
-var searchEngineOptions searchEngine.Options
+var searchEngineOptions searchengine.Options
 
 // o365Cmd represents the o365 command
 var searchEngineCmd = &cobra.Command{

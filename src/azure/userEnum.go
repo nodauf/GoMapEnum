@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// Data of the request which will be sent to authenticate
+// BASE_XML is the data of the request which will be sent to authenticate
 var BASE_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing" xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
   <s:Header>
@@ -47,6 +47,8 @@ var BASE_XML = `<?xml version="1.0" encoding="UTF-8"?>
   </s:Body>
 </s:Envelope>
 `
+
+// AZURE_URL is the url to authenticate on
 var AZURE_URL = "https://autologon.microsoftazuread-sso.com/%s/winauth/trust/2005/usernamemixed?client-request-id=%s"
 
 var log *logger.Logger

@@ -13,8 +13,8 @@ import (
 // getPresence request the Teams API to get additional details about the user with its mri
 func (options *Options) getPresence(mri, bearer string, log *logger.Logger) (string, string, string) {
 
-	var json_data = []byte(`[{"mri":"` + mri + `"}]`)
-	req, _ := http.NewRequest("POST", URL_PRESENCE_TEAMS, bytes.NewBuffer(json_data))
+	var jsonData = []byte(`[{"mri":"` + mri + `"}]`)
+	req, _ := http.NewRequest("POST", URL_PRESENCE_TEAMS, bytes.NewBuffer(jsonData))
 	req.Header.Add("Authorization", bearer)
 	req.Header.Add("x-ms-client-version", CLIENT_VERSION)
 	req.Header.Set("Content-Type", "application/json")

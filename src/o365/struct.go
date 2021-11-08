@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 )
 
+// Options for o365 module
 type Options struct {
 	Mode             string
 	LockoutThreshold int

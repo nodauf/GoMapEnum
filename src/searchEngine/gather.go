@@ -1,4 +1,4 @@
-package searchEngine
+package searchengine
 
 import (
 	"GoMapEnum/src/utils"
@@ -7,15 +7,17 @@ import (
 	"strings"
 )
 
+// SEARCH_ENGINE contains url for search on Google and Bing
 var SEARCH_ENGINE = map[string]string{"google": `https://www.google.com/search?q=site:linkedin.com/in+"%s"&num=100&start=%d`,
 	"bing": `http://www.bing.com/search?q=site:linkedin.com/in+"%s"&first=%d`}
 
-// Regex to extract title from search engine's results
+// REGEX_TITLE is the regex to extract title from search engine's results
 var REGEX_TITLE = `<h[23](.*?")?>(.*?)<\/h[23]>`
 
-// Regex to extract field from the title
+// REGEX_LINKEDIN is the regex to extract field from the title
 var REGEX_LINKEDIN = `<h[23](.*?")?>(?P<FirstName>.*?) (?P<LastName>.*?) [-–] (?P<Title>.*?) [-–] (?P<Company>.*?)(\| LinkedIn)(.*?)<\/h[23]>`
 
+// Gather will search a company name and returned the list of people in specified format
 func (options *Options) Gather() []string {
 	var output []string
 	log = options.Log
