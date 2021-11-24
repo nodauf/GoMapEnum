@@ -1,4 +1,7 @@
+[![Goland card](https://goreportcard.com/badge/github.com/nodauf/GoMapEnum)](https://goreportcard.com/report/github.com/nodauf/GoMapEnum)
 # goEnumBruteSpray
+
+Nothing new but existing techniques are brought together in one tool.
 
 ## Description
 
