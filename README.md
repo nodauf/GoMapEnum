@@ -61,6 +61,10 @@ Please note that no account locking mechanism can be implemented because no info
 
 ![Password bruteforce / spraying on owa](./images/owa-brute.png)
 
+## TODO
+- [ ] Support Kerberos protocol
+- [ ] Support SMB protocol
+
 ## Credits
 https://github.com/busterb/msmailprobe
 https://github.com/0xZDH/o365spray/
