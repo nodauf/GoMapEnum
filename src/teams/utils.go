@@ -51,6 +51,8 @@ func (options *Options) getPresence(mri, bearer string, log *logger.Logger) (str
 	}
 
 	json.Unmarshal([]byte(body), &status)
+	bytes, _ := json.MarshalIndent(status, "", " ")
+	log.Debug("Response: " + string(bytes))
 
 	if len(status) > 0 {
 		return status[0].Presence.Availability, status[0].Presence.DeviceType, status[0].Presence.CalendarData.OutOfOfficeNote.Message
