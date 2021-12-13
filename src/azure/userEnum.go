@@ -140,6 +140,9 @@ func (options *Options) UserEnum() []string {
 		email = strings.ToValidUTF8(email, "")
 		email = strings.Trim(email, "\r")
 		email = strings.Trim(email, "\n")
+		if email == "" {
+			continue
+		}
 		queue <- email
 	}
 
