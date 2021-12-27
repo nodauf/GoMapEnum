@@ -9,7 +9,8 @@ var log *logger.Logger
 
 // Options for searchengine module
 type Options struct {
-	Format     string
-	ExactMatch bool
+	Format       string
+	ExactMatch   bool
+	SearchEngine string
 	utils.BaseOptions
 }

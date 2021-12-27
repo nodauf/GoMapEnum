@@ -30,6 +30,7 @@ func init() {
 	searchEngineCmd.Flags().StringVarP(&searchEngineOptions.Format, "format", "f", "", "Format (ex:{first}.{last}@domain.com, domain\\{f}{last}")
 	searchEngineCmd.Flags().StringVarP(&searchEngineOptions.Company, "company", "c", "", "Company name")
 	searchEngineCmd.Flags().BoolVarP(&searchEngineOptions.ExactMatch, "exactMatch", "e", false, "Exact match of the company's name")
+	searchEngineCmd.Flags().StringVarP(&searchEngineOptions.SearchEngine, "searchEngine", "s", "", "Select on which search engine the query will be made, ex: bing,google (default: all)")
 	searchEngineCmd.MarkFlagRequired("company")
 	searchEngineCmd.MarkFlagRequired("format")
 }

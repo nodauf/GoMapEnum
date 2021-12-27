@@ -20,10 +20,10 @@ var REGEX_LINKEDIN = `<h[23](.*?")?>(?P<FirstName>.*?) (?P<LastName>.*?) [-–] 
 // Gather will search a company name and returned the list of people in specified format
 func (options *Options) Gather() []string {
 	var output []string
+	var searchEngineToUse []string
 	log = options.Log
 	// Always insensitive case compare
 	options.Company = strings.ToLower(options.Company)
-	for searchEngine, formatUrl := range SEARCH_ENGINE {
 		log.Target = searchEngine
 		log.Verbose("Searching on " + searchEngine + " about " + options.Company)
 		url := fmt.Sprintf(formatUrl, options.Company, 0)
@@ -38,6 +38,18 @@ func (options *Options) Gather() []string {
 			log.Error("Too many requests")
 			continue
 		}
+	if options.SearchEngine != "" {
+		searchEngineToUse = strings.Split(options.SearchEngine, ",")
+	} else {
+		searchEngineToUse = utils.GetKeysMap(SEARCH_ENGINE)
+	}
+	// For specififed search engine
+	for _, searchEngine := range searchEngineToUse {
+		formatUrl := SEARCH_ENGINE[searchEngine]
+		// Reset the variables values
+		var startSearch = 0
+
+		// Compile the regex. May be different for each search engine
 		reTitle := regexp.MustCompile(REGEX_TITLE)
 		reData := regexp.MustCompile(REGEX_LINKEDIN)
 		// Extract all links of the body

@@ -126,3 +126,13 @@ func GetBodyInWebsite(url string, proxy func(*http.Request) (*url.URL, error), h
 	body, _ := ioutil.ReadAll(resp.Body)
 	return string(body), resp.StatusCode, nil
 }
+
+
+// GetKeysMap return all the keys of the map. According to https://programmerah.com/how-to-get-all-the-keys-of-map-by-golang-1723/ this is the most efficient way to do it
+func GetKeysMap(m map[string]string) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
