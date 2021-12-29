@@ -143,6 +143,7 @@ func UniqueSliceString(list []string) []string {
 	return uinque
 }
 
+// SearchReplaceMap will search and replace a string by another in all the map
 func SearchReplaceMap(mapToReplace map[string]string, old, new string) map[string]string {
 	var newMap = make(map[string]string)
 	for key, value := range mapToReplace {
