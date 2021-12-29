@@ -10,6 +10,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -127,6 +128,29 @@ func GetBodyInWebsite(url string, proxy func(*http.Request) (*url.URL, error), h
 	return string(body), resp.StatusCode, nil
 }
 
+// UniqueSliceString returns a slice without any duplicae
+func UniqueSliceString(list []string) []string {
+	check := make(map[string]bool)
+	var uinque []string
+
+	for _, val := range list {
+		if _, ok := check[val]; !ok {
+			check[val] = true
+			uinque = append(uinque, val)
+		}
+	}
+
+	return uinque
+}
+
+func SearchReplaceMap(mapToReplace map[string]string, old, new string) map[string]string {
+	var newMap = make(map[string]string)
+	for key, value := range mapToReplace {
+		value = strings.ReplaceAll(value, old, new)
+		newMap[key] = value
+	}
+	return newMap
+}
 
 // GetKeysMap return all the keys of the map. According to https://programmerah.com/how-to-get-all-the-keys-of-map-by-golang-1723/ this is the most efficient way to do it
 func GetKeysMap(m map[string]string) []string {
