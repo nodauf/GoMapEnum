@@ -15,7 +15,8 @@ var SEARCH_ENGINE = map[string]string{"google": `https://www.google.com/search?q
 var REGEX_TITLE = `<h[23](.*?")?>(.*?)<\/h[23]>`
 
 // REGEX_LINKEDIN is the regex to extract field from the title
-var REGEX_LINKEDIN = `<h[23](.*?")?>(?P<FirstName>.*?) (?P<LastName>.*?) [-–] (?P<Title>.*?) [-–] (?P<Company>.*?)(\| LinkedIn)(.*?)<\/h[23]>`
+var REGEX_LINKEDIN = map[string]string{"google": `<h[23](.*?")?>(?P<FirstName>.*?) (?P<LastName>.*?) [-–] (?P<Title>.*?) [-–] (?P<Company>.*?)(\| LinkedIn)(.*?)<\/h[23]>`,
+	"bing": `<h[23](.*?")?>(?P<FirstName>.*?) (?P<LastName>.*?) [-–] (?P<Title>.*?) [-–] (?P<Company>.*?)(\| LinkedIn)(.*?)<\/h[23]>`}
 
 // Gather will search a company name and returned the list of people in specified format
 func (options *Options) Gather() []string {
