@@ -79,7 +79,7 @@ func (options *Options) getPeople(companyID, start int) []string {
 				email = strings.ReplaceAll(email, "{last}", name[1])
 				email = strings.ReplaceAll(email, "{l}", name[1][0:1])
 				email = strings.ToLower(email)
-				log.Success(email)
+				log.Success(email + " - " + people.PrimarySubtitle.Text + "-" + people.SecondarySubtitle.Text)
 				output = append(output, email)
 			}
 
