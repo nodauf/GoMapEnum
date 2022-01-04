@@ -10,6 +10,7 @@ var log *logger.Logger
 // Options for o365 module
 type Options struct {
 	Format     string
+	Email      bool
 	ExactMatch bool
 	Cookie     string
 	utils.BaseOptions

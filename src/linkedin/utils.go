@@ -31,7 +31,6 @@ func (options *Options) getCompany() linkedinListCompany {
 		return companies
 	}
 	json.Unmarshal([]byte(body), &companies)
-	log.Debug("Found " + strconv.Itoa(len(companies.Elements)) + " companies matching " + options.Company)
 	return companies
 }
 
@@ -64,6 +63,7 @@ func (options *Options) getPeople(companyID, start int) []string {
 		}
 
 		numberPeople = len(element.Results)
+		log.Debug("Found " + strconv.Itoa(numberPeople) + " from " + strconv.Itoa(start) + " for " + options.Company)
 		for _, people := range element.Results {
 			// if it is an anonymous user, skip it
 			if people.Title.Text == "LinkedIn Member" {
@@ -71,8 +71,8 @@ func (options *Options) getPeople(companyID, start int) []string {
 			}
 			// Parse the name to output in the specified format
 			name := strings.Split(people.Title.Text, " ")
-			// If the name is composed of more than 2 words, we skip it
-			if len(name) == 2 {
+			// If the name is composed of more than 2 words or the email should not be guessed, we skip it
+			if len(name) == 2 && options.Email {
 				var email string
 				email = options.Format
 				log.Verbose(name[0] + " - " + name[1])
@@ -81,8 +81,14 @@ func (options *Options) getPeople(companyID, start int) []string {
 				email = strings.ReplaceAll(email, "{last}", name[1])
 				email = strings.ReplaceAll(email, "{l}", name[1][0:1])
 				email = strings.ToLower(email)
-				log.Success(email + " - " + people.PrimarySubtitle.Text + "-" + people.SecondarySubtitle.Text)
+				log.Success(email + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text)
 				output = append(output, email)
+			}
+			if !options.Email {
+				result := people.Title.Text + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text
+				log.Success(result)
+				output = append(output, result)
+
 			}
 
 		}

@@ -19,6 +19,7 @@ func (options *Options) Gather() []string {
 	options.Company = strings.ToLower(options.Company)
 	// Get all the companies from the option
 	companies := options.getCompany()
+	log.Debug("Found " + strconv.Itoa(len(companies.Elements)) + " companies matching " + options.Company)
 	for _, company := range companies.Elements {
 		// Extract the company name from the struct
 		companyLinkedinName := strings.ToLower(company.EntityLockupView.Title.Text)
@@ -29,6 +30,7 @@ func (options *Options) Gather() []string {
 			companyID, _ := strconv.Atoi(strings.Split(company.EntityLockupView.TrackingUrn, ":")[3])
 			// Get the people of the company, starting from 0
 			output = options.getPeople(companyID, 0)
+			log.Debug("Found " + strconv.Itoa(len(output)) + " peoples for " + options.Company)
 		}
 	}
 
