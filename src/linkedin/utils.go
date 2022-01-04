@@ -4,6 +4,7 @@ import (
 	"GoMapEnum/src/utils"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -30,6 +31,7 @@ func (options *Options) getCompany() linkedinListCompany {
 		return companies
 	}
 	json.Unmarshal([]byte(body), &companies)
+	log.Debug("Found " + strconv.Itoa(len(companies.Elements)) + " companies matching " + options.Company)
 	return companies
 }
 
