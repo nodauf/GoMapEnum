@@ -13,6 +13,7 @@ func (options *Options) UserEnum() []string {
 	emailList := strings.Split(options.Users, "\n")
 	var wg sync.WaitGroup
 	var validusers []string
+	domainValidated := make(map[string]bool)
 	queue := make(chan string)
 
 	for i := 0; i < options.Thread; i++ {
@@ -22,11 +23,26 @@ func (options *Options) UserEnum() []string {
 			defer wg.Done()
 			for email := range queue {
 				domain := strings.Split(email, "@")[1]
-				if !options.validTenant(domain) {
-					options.Log.Error("Tenant " + domain + " is not valid")
-					return
+				// If we didn't already checked the domain
+				mux.Lock()
+				if domainValid, ok := domainValidated[domain]; !ok {
+					if !options.validTenant(domain) {
+						options.Log.Error("Tenant " + domain + " is not valid")
+						domainValidated[domain] = false
+						mux.Unlock()
+						continue
+					}
+					options.Log.Info("Tenant " + domain + " is valid")
+					domainValidated[domain] = true
+				} else {
+					// If the domain was not valid, skip the email
+					if !domainValid {
+						options.Log.Debug("Tenant " + domain + " already checked and was not valid")
+						mux.Unlock()
+						continue
+					}
 				}
-				options.Log.Verbose("Tenant " + domain + " is valid")
+				mux.Unlock()
 
 				switch options.Mode {
 				case "office":
