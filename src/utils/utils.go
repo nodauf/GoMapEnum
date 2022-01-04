@@ -161,12 +161,3 @@ func GetKeysMap(m map[string]string) []string {
 	}
 	return keys
 }
-
-func StringInSlice(item string, slice []string) bool {
-	for _, elementOfSlice := range slice {
-		if item == elementOfSlice {
-			return true
-		}
-	}
-	return false
-}
