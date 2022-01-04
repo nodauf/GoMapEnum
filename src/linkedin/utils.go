@@ -12,7 +12,7 @@ import (
 func (options *Options) getCompany() linkedinListCompany {
 	var companies linkedinListCompany
 
-	url := fmt.Sprintf(LINKEDIN_LIST_COMPANY, options.Company)
+	url := fmt.Sprintf(LINKEDIN_LIST_COMPANY, url.QueryEscape(options.Company))
 	header := make(map[string]string)
 	header["csrf-token"] = "ajax:1337"
 	header["x-restli-protocol-version"] = "2.0.0"
