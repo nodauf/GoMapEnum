@@ -13,6 +13,8 @@ The recommended module is o365 for user enumeration and passwords bruteforce / s
 This module should be used to retrieve a list of email addresses before validating them through a user enumeration module.
 The company will be searched on Linkedin and all people working at these companies will be returned in the specified format.
 
+_Note that no profile will be viewed and therefore the user will not receive any notification._
+
 The Linkedin's session cookie `li_at` is required.
 
 ![User enumeration on owa](./images/linkedin-gather.png)
