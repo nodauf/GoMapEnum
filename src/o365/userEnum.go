@@ -22,6 +22,10 @@ func (options *Options) UserEnum() []string {
 		go func(i int) {
 			defer wg.Done()
 			for email := range queue {
+				if len(strings.Split(email, "@")) == 1 {
+					options.Log.Fail(email + " is not an email")
+					continue
+				}
 				domain := strings.Split(email, "@")[1]
 				// If we didn't already checked the domain
 				mux.Lock()
