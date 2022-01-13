@@ -34,7 +34,7 @@ go run main.go bruteSpray adfs -t adfs.contoso.com -u john.doe@contoso.com  -p A
 		adfsOptions.NoBruteforce = noBruteforce
 		adfsOptions.Sleep = sleep
 		adfsOptions.Proxy = proxy
-		adfsOptions.Brute()
+		validUsers = adfsOptions.Brute()
 	},
 }
 

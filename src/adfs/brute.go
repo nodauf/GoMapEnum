@@ -9,15 +9,18 @@ import (
 )
 
 // Brute will bruteforce or spray passwords on the specified users.
-func (options *Options) Brute() {
+func (options *Options) Brute() []string {
 	log = options.Log
 	var wg sync.WaitGroup
+	var validusers []string
+	mux := &sync.Mutex{}
+
 	// If the target is not specified, we will try to find the ADFS URL with the endpoint getuserrealm
 	if options.Target == "" {
 		options.Target = options.findTarget(options.Domain)
 		if options.Target == "" {
 			log.Error("The ADFS URL was not found")
-			return
+			return validusers
 		}
 		log.Verbose("An ADFS instance has been found on " + options.Target)
 	}
@@ -40,11 +43,18 @@ func (options *Options) Brute() {
 					time.Sleep(time.Duration(options.Sleep) * time.Second)
 				}
 				if options.NoBruteforce {
-					options.brute(email, passwordList[j])
+					if options.brute(email, passwordList[j]) {
+						mux.Lock()
+						validusers = append(validusers, email)
+						mux.Unlock()
+					}
 
 				} else {
 					for _, password := range passwordList {
 						if options.brute(email, password) {
+							mux.Lock()
+							validusers = append(validusers, email)
+							mux.Unlock()
 							break // No need to continue if password is valid
 						}
 					}
@@ -65,5 +75,6 @@ func (options *Options) Brute() {
 
 	close(queue)
 	wg.Wait()
+	return validusers
 
 }
