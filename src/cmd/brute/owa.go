@@ -26,7 +26,7 @@ go run main.go bruteSpray owa -u john.doe@contoso.com -p Automn2021! -t mail.con
 		owaOptions.Proxy = proxy
 		owaOptions.NoBruteforce = noBruteforce
 		owaOptions.Sleep = sleep
-		owaOptions.Brute()
+		validUsers = owaOptions.Brute()
 
 	},
 }

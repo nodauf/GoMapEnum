@@ -11,9 +11,11 @@ import (
 )
 
 // Brute will bruteforce or spray passwords on the specified users.
-func (options *Options) Brute() {
+func (options *Options) Brute() []string {
 	var emailList []string
 	var wg sync.WaitGroup
+	var validUsers []string
+	mux := &sync.Mutex{}
 	var nbLockout = 0
 	if options.CheckIfValid {
 		options.Log.Debug("Validating the users")
@@ -52,10 +54,17 @@ func (options *Options) Brute() {
 					time.Sleep(time.Duration(options.Sleep) * time.Second)
 				}
 				if options.NoBruteforce {
-					options.authenticate(email, passwordList[j], &nbLockout)
+					if options.authenticate(email, passwordList[j], &nbLockout) {
+						mux.Lock()
+						validUsers = append(validUsers, email+" / "+passwordList[j])
+						mux.Unlock()
+					}
 				} else {
 					for _, password := range passwordList {
 						if options.authenticate(email, password, &nbLockout) {
+							mux.Lock()
+							validUsers = append(validUsers, email+" / "+password)
+							mux.Unlock()
 							break // No need to continue if password is valid
 						}
 					}
@@ -75,6 +84,7 @@ func (options *Options) Brute() {
 
 	close(queue)
 	wg.Wait()
+	return validUsers
 
 }
 

@@ -45,7 +45,7 @@ func (options *Options) Brute() []string {
 				if options.NoBruteforce {
 					if options.brute(email, passwordList[j]) {
 						mux.Lock()
-						validusers = append(validusers, email)
+						validusers = append(validusers, email+" / "+passwordList[j])
 						mux.Unlock()
 					}
 
@@ -53,7 +53,7 @@ func (options *Options) Brute() []string {
 					for _, password := range passwordList {
 						if options.brute(email, password) {
 							mux.Lock()
-							validusers = append(validusers, email)
+							validusers = append(validusers, email+" / "+password)
 							mux.Unlock()
 							break // No need to continue if password is valid
 						}

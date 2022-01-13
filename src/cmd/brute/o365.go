@@ -35,7 +35,7 @@ By default, if one account is being lock, the all attack will be stopped.
 		o365Options.Proxy = proxy
 		o365Options.NoBruteforce = noBruteforce
 		o365Options.Sleep = sleep
-		o365Options.Brute()
+		validUsers = o365Options.Brute()
 	},
 }
 
