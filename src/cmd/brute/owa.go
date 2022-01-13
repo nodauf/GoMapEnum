@@ -39,4 +39,5 @@ func init() {
 	owaCmd.Flags().IntVar(&owaOptions.Thread, "thread", 2, "Number of threads ")
 	owaCmd.MarkFlagRequired("user")
 	owaCmd.MarkFlagRequired("password")
+	owaCmd.MarkFlagRequired("target")
 }
