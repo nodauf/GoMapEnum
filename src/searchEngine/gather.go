@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/mozillazg/go-unidecode"
 )
 
 // SEARCH_ENGINE contains url for search on Google and Bing
@@ -83,7 +85,7 @@ func (options *Options) Gather() []string {
 					email = strings.ReplaceAll(email, "{f}", result["FirstName"][0:1])
 					email = strings.ReplaceAll(email, "{last}", result["LastName"])
 					email = strings.ReplaceAll(email, "{l}", result["LastName"][0:1])
-					email = strings.ToLower(email)
+					email = strings.ToLower(unidecode.Unidecode(email))
 					log.Success(email)
 					output = append(output, email)
 					nbFoundEmail += 1
