@@ -2,7 +2,8 @@ package brute
 
 import (
 	"GoMapEnum/src/logger"
-	"GoMapEnum/src/owa"
+	"GoMapEnum/src/modules/owa"
+	"GoMapEnum/src/orchestrator"
 
 	"github.com/spf13/cobra"
 )
@@ -26,17 +27,23 @@ go run main.go bruteSpray owa -u john.doe@contoso.com -p Automn2021! -t mail.con
 		owaOptions.Proxy = proxy
 		owaOptions.NoBruteforce = noBruteforce
 		owaOptions.Sleep = sleep
-		owaOptions.Brute()
+
+		orchestratorOptions := orchestrator.Orchestrator{}
+		orchestratorOptions.PreActionBruteforce = owa.PrepareBruteforce
+		orchestratorOptions.CustomOptionsForCheckIfValid = owa.PrepareOptions
+		validUsers = orchestratorOptions.Bruteforce(&owaOptions)
 
 	},
 }
 
 func init() {
 
+	owaCmd.Flags().BoolVarP(&o365Options.CheckIfValid, "check", "c", true, "Check if the user is valid before trying password")
 	owaCmd.Flags().StringVarP(&owaOptions.Users, "user", "u", "", "User or file containing the emails")
 	owaCmd.Flags().StringVarP(&owaOptions.Passwords, "password", "p", "", "Password or file containing the passwords")
 	owaCmd.Flags().StringVarP(&owaOptions.Target, "target", "t", "", "Host pointing to the OWA service")
-	owaCmd.Flags().IntVar(&owaOptions.Thread, "thread", 2, "Number of threads ")
+	owaCmd.Flags().IntVar(&owaOptions.Thread, "thread", 2, "Number of threads")
+	owaCmd.Flags().BoolVar(&owaOptions.Basic, "basic", false, "Basic authentication instead of NTLM")
 	owaCmd.MarkFlagRequired("user")
 	owaCmd.MarkFlagRequired("password")
 	owaCmd.MarkFlagRequired("target")

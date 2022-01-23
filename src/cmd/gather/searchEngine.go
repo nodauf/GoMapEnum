@@ -2,7 +2,7 @@ package gather
 
 import (
 	"GoMapEnum/src/logger"
-	searchengine "GoMapEnum/src/searchEngine"
+	searchengine "GoMapEnum/src/modules/searchEngine"
 
 	"github.com/spf13/cobra"
 )

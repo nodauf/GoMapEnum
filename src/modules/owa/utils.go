@@ -8,11 +8,13 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/Azure/go-ntlmssp"
 )
 
 //harvestInternalDomain retrieve the internal domain name (netbios format)
 func (options *Options) harvestInternalDomain(urlToHarvest string) string {
-	log.Verbose("Attempting to harvest internal domain:")
+	options.Log.Verbose("Attempting to harvest internal domain:")
 
 	timeout := time.Duration(3 * time.Second)
 
@@ -32,7 +34,7 @@ func (options *Options) harvestInternalDomain(urlToHarvest string) string {
 	data := strings.Split(ntlmResponse, " ")
 	base64DecodedResp, err := base64.StdEncoding.DecodeString(data[1])
 	if err != nil {
-		log.Error("Unable to parse NTLM response for internal domain name")
+		options.Log.Error("Unable to parse NTLM response for internal domain name")
 		return ""
 	}
 
@@ -79,8 +81,9 @@ func (options *Options) getURIToAuthenticate(host string) string {
 	} else if options.webRequestCodeResponse(url6) == 401 {
 		urlToHarvest = url6
 	} else {
-		log.Fatal("Unable to resolve host provided to harvest internal domain name")
+		options.Log.Fatal("Unable to resolve host provided to harvest internal domain name")
 	}
+	options.Log.Verbose("OWA url that will be used: " + urlToHarvest)
 	return urlToHarvest
 }
 
@@ -96,39 +99,55 @@ func (options *Options) webRequestCodeResponse(URI string) int {
 	req.Header.Set("User-Agent", utils.GetUserAgent())
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error(err.Error())
-		return 0
+		options.Log.Error(err.Error())
 	}
 	return resp.StatusCode
 }
 
 // webRequestBasicAuth authenticate with basic auth on an URI
-func webRequestBasicAuth(URI, user, pass string, tr *http.Transport) int {
+func (options *Options) webRequestBasicAuth(URI, user, pass string) bool {
 	timeout := time.Duration(45 * time.Second)
-	client := &http.Client{
-		Timeout:   timeout,
-		Transport: tr,
+	var client = &http.Client{}
+	if options.Basic {
+		client = &http.Client{
+			Timeout:   timeout,
+			Transport: options.tr,
+		}
+	} else {
+		client = &http.Client{
+			Timeout: timeout,
+			Transport: ntlmssp.Negotiator{
+				RoundTripper: options.tr,
+			},
+		}
 	}
-
 	req, _ := http.NewRequest("GET", URI, nil)
 	req.Header.Set("User-Agent", utils.GetUserAgent())
 	req.SetBasicAuth(user, pass)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error("Potential Timeout - " + user)
-		log.Error("One of your requests has taken longer than 45 seconds to respond.")
-		log.Error("Consider lowering amount of threads used for enumeration.")
-		log.Error(err.Error())
+		options.Log.Error("Potential Timeout - " + user)
+		options.Log.Error("One of your requests has taken longer than 45 seconds to respond.")
+		options.Log.Error("Consider lowering amount of threads used for enumeration.")
+		options.Log.Error(err.Error())
 	}
-	return resp.StatusCode
+	if resp.StatusCode == 500 {
+		options.Log.Error("Something went wrong. Status code is 500")
+		return false
+	}
+	if resp.StatusCode != 401 {
+		return true
+	}
+
+	return false
 }
 
 // basicAuthAvgTime get an average response time for unknown users
-func (options Options) basicAuthAvgTime(urlToHarvest, internaldomain string) time.Duration {
+func (options *Options) basicAuthAvgTime(urlToHarvest, internaldomain string) time.Duration {
 	//We are determining sample auth response time for invalid users, the password used is irrelevant.
 	pass := "Summer201823904"
 
-	log.Verbose("Collecting sample auth times...")
+	options.Log.Verbose("Collecting sample auth times...")
 
 	var sliceOfTimes []float64
 	var medianTime float64
@@ -136,16 +155,16 @@ func (options Options) basicAuthAvgTime(urlToHarvest, internaldomain string) tim
 	usernamelist := []string{"sdfsdskljdfhkljhf", "ssdlfkjhgkjhdfsdfw", "sdfsdfdsfff", "sefsefsefsss", "lkjhlkjhiuyoiuy", "khiuoiuhohuio", "s2222dfs45g45gdf", "sdfseddf3333"}
 	for i := 0; i < len(usernamelist)-1; i++ {
 		startTime := time.Now()
-		webRequestBasicAuth(urlToHarvest, internaldomain+"\\"+usernamelist[i], pass, options.tr)
+		options.webRequestBasicAuth(urlToHarvest, internaldomain+"\\"+usernamelist[i], pass)
 		elapsedTime := time.Since(startTime)
 		if elapsedTime > time.Second*15 {
-			log.Error("Response taking longer than 15 seconds, setting time:")
-			log.Debug("Avg Response:" + fmt.Sprint(time.Duration(elapsedTime)))
+			options.Log.Error("Response taking longer than 15 seconds, setting time:")
+			options.Log.Debug("Avg Response:" + fmt.Sprint(time.Duration(elapsedTime)))
 			return time.Duration(elapsedTime)
 		}
 		// The first user has sometime an higher response time than the others
 		if i != 0 {
-			log.Debug(fmt.Sprint(elapsedTime))
+			options.Log.Debug(fmt.Sprint(elapsedTime))
 			sliceOfTimes = append(sliceOfTimes, float64(elapsedTime))
 		}
 	}
@@ -160,6 +179,6 @@ func (options Options) basicAuthAvgTime(urlToHarvest, internaldomain string) tim
 	} else {
 		fmt.Println("Error determining whether length of times gathered is even or odd to obtain median value.")
 	}
-	log.Debug("Avg Response:" + fmt.Sprint(time.Duration(medianTime)))
+	options.Log.Debug("Avg Response:" + fmt.Sprint(time.Duration(medianTime)))
 	return time.Duration(medianTime)
 }

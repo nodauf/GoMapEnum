@@ -1,8 +1,8 @@
 package gather
 
 import (
-	"GoMapEnum/src/linkedin"
 	"GoMapEnum/src/logger"
+	"GoMapEnum/src/modules/linkedin"
 	"errors"
 
 	"github.com/spf13/cobra"

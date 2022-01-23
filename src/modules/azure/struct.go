@@ -9,6 +9,10 @@ type Options struct {
 	utils.BaseOptions
 }
 
+func (options *Options) GetBaseOptions() *utils.BaseOptions {
+	return &options.BaseOptions
+}
+
 type azureResponse struct {
 	Body struct {
 		Fault struct {

@@ -5,11 +5,13 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 // BaseOptions is the common options for the module
 type BaseOptions struct {
 	Users            string
+	UsernameList     []string
 	Passwords        string
 	Thread           int
 	Log              *logger.Logger
@@ -20,6 +22,7 @@ type BaseOptions struct {
 	CheckIfValid     bool
 	Company          string
 	Proxy            func(*http.Request) (*url.URL, error)
+	Mutex            sync.Mutex
 }
 
 // ErrLockout is the error to returned when an account is locked

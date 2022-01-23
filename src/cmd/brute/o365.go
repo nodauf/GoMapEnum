@@ -2,7 +2,8 @@ package brute
 
 import (
 	"GoMapEnum/src/logger"
-	"GoMapEnum/src/o365"
+	"GoMapEnum/src/modules/o365"
+	"GoMapEnum/src/orchestrator"
 	"errors"
 	"strings"
 
@@ -35,7 +36,15 @@ By default, if one account is being lock, the all attack will be stopped.
 		o365Options.Proxy = proxy
 		o365Options.NoBruteforce = noBruteforce
 		o365Options.Sleep = sleep
-		o365Options.Brute()
+
+		orchestratorOptions := orchestrator.Orchestrator{}
+		orchestratorOptions.CustomOptionsForCheckIfValid = o365.PrepareOptions
+		orchestratorOptions.AuthenticationFunc = o365.Authenticate
+		orchestratorOptions.UserEnumFunc = o365.UserEnum
+		// To check if the user is valid
+		orchestratorOptions.CheckBeforeEnumFunc = o365.CheckTenant
+		orchestratorOptions.AuthenticationFunc = o365.Authenticate
+		validUsers = orchestratorOptions.Bruteforce(&o365Options)
 	},
 }
 

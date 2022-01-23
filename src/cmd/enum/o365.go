@@ -2,7 +2,8 @@ package enum
 
 import (
 	"GoMapEnum/src/logger"
-	"GoMapEnum/src/o365"
+	"GoMapEnum/src/modules/o365"
+	"GoMapEnum/src/orchestrator"
 	"errors"
 	"strings"
 
@@ -31,7 +32,10 @@ var o365Cmd = &cobra.Command{
 		log.Info("Starting the module O365")
 		o365Options.Log = log
 		o365Options.Proxy = proxy
-		validUsers = o365Options.UserEnum()
+		orchestratorOptions := orchestrator.Orchestrator{}
+		orchestratorOptions.CheckBeforeEnumFunc = o365.CheckTenant
+		orchestratorOptions.UserEnumFunc = o365.UserEnum
+		validUsers = orchestratorOptions.UserEnum(&o365Options)
 	},
 }
 

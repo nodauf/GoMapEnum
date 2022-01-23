@@ -14,3 +14,7 @@ type Options struct {
 	Thread int
 	utils.BaseOptions
 }
+
+func (options *Options) GetBaseOptions() *utils.BaseOptions {
+	return &options.BaseOptions
+}
