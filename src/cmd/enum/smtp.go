@@ -14,9 +14,9 @@ var smtpOptions smtp.Options
 var smtpCmd = &cobra.Command{
 	Use:   "smtp",
 	Short: "Enumerate email address by connection to the smtp port of the target.",
-	Long: ` 
+	Long: `SMTP user enumeration with RCPT, VRFY and EXPN.
 	Credits: https://github.com/cytopia/smtp-user-enum`,
-	Example: `go run main.go userenum smtp -u users  -t mail.contoso.com -o validUsers`,
+	Example: `go run main.go userenum smtp -u users  -t mail.contoso.com -d domain.tld -o validUsers`,
 	Run: func(cmdCli *cobra.Command, args []string) {
 		log := logger.New("Enumeration", "SMTP", smtpOptions.Target)
 		log.SetLevel(level)
