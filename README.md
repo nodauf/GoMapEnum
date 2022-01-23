@@ -82,3 +82,4 @@ https://github.com/busterb/msmailprobe
 https://github.com/0xZDH/o365spray/
 https://github.com/xFreed0m/ADFSpray/
 https://github.com/m8r0wn/CrossLinked
+https://github.com/cytopia/smtp-user-enum
