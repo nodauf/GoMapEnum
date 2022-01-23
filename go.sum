@@ -196,6 +196,8 @@ github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lN
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/nodauf/net-smtp v0.0.0-20220123142515-ae3aa26fb163 h1:ibyr4sPQNrPAK4fGuJxdIyX8tC8ytoTe/ryoQ5YpIRk=
 github.com/nodauf/net-smtp v0.0.0-20220123142515-ae3aa26fb163/go.mod h1:bpKTQ3KO0V60W040bsyRGv/w7HxFYDQHGmBwgB4copE=
+github.com/mozillazg/go-unidecode v0.1.1 h1:uiRy1s4TUqLbcROUrnCN/V85Jlli2AmDF6EeAXOeMHE=
+github.com/mozillazg/go-unidecode v0.1.1/go.mod h1:fYMdhyjni9ZeEmS6OE/GJHDLsF8TQvIVDwYR/drR26Q=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.9.3/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

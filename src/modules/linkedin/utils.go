@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/mozillazg/go-unidecode"
 )
 
 // getCompany return a struct that contains all the company of the research
@@ -80,7 +82,7 @@ func (options *Options) getPeople(companyID, start int) []string {
 				email = strings.ReplaceAll(email, "{f}", name[0][0:1])
 				email = strings.ReplaceAll(email, "{last}", name[1])
 				email = strings.ReplaceAll(email, "{l}", name[1][0:1])
-				email = strings.ToLower(email)
+				email = strings.ToLower(unidecode.Unidecode(email))
 				log.Success(email + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text)
 				output = append(output, email)
 			}

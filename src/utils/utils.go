@@ -125,6 +125,7 @@ func GetBodyInWebsite(url string, proxy func(*http.Request) (*url.URL, error), h
 		return "", -1, err
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
 	return string(body), resp.StatusCode, nil
 }
 
