@@ -52,6 +52,7 @@ As for the user enumeration, two modes are available: oauth2 and autodiscover (n
 
 ### OWA
 This module allows to enumerate users and bruteforce / spray passwords. 
+Currently NTLM and basic authentication is supported
 
 #### User enumeration
 Enumeration is made with authentication requests. Authentication for a non-existent user will take longer than for a valid user. At first, the average response time for an invalid user will be calculated and then the response time for each authentication request will be compared.
