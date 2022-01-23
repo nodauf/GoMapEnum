@@ -9,7 +9,14 @@ import (
 type Options struct {
 	Mode             string
 	LockoutThreshold int
+
+	lockoutCounter int
+	validTenants   map[string]bool
 	utils.BaseOptions
+}
+
+func (options *Options) GetBaseOptions() *utils.BaseOptions {
+	return &options.BaseOptions
 }
 
 type officeData struct {

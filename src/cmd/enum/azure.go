@@ -1,8 +1,9 @@
 package enum
 
 import (
-	"GoMapEnum/src/azure"
 	"GoMapEnum/src/logger"
+	"GoMapEnum/src/modules/azure"
+	"GoMapEnum/src/orchestrator"
 
 	"github.com/spf13/cobra"
 )
@@ -23,7 +24,10 @@ var azureCmd = &cobra.Command{
 		log.Info("Starting the module Azure")
 		azureOptions.Log = log
 		azureOptions.Proxy = proxy
-		validUsers = azureOptions.UserEnum()
+
+		orchestratorOptions := orchestrator.Orchestrator{}
+		orchestratorOptions.UserEnumFunc = azure.UserEnum
+		validUsers = orchestratorOptions.UserEnum(&azureOptions)
 	},
 }
 

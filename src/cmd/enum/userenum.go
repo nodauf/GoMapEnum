@@ -48,6 +48,7 @@ func init() {
 	UserenumCmd.AddCommand(o365Cmd)
 	UserenumCmd.AddCommand(owaCmd)
 	UserenumCmd.AddCommand(teamsCmd)
+	UserenumCmd.AddCommand(smtpCmd)
 
 }
 

@@ -216,11 +216,14 @@ func (options *Options) bruteOauth2(username, password string) (bool, error) {
 
 		}
 	} else if respStruct.AccessToken != "" {
-
+		valid = true
 		options.Log.Success(username + " / " + password + " matched")
 
 	}
+	if !valid {
+		options.Log.Debug(username + " / " + password + " did not match")
 
+	}
 	return valid, nil
 }
 

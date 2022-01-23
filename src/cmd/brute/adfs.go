@@ -1,8 +1,9 @@
 package brute
 
 import (
-	"GoMapEnum/src/adfs"
 	"GoMapEnum/src/logger"
+	"GoMapEnum/src/modules/adfs"
+	"GoMapEnum/src/orchestrator"
 	"errors"
 
 	"github.com/spf13/cobra"
@@ -34,7 +35,11 @@ go run main.go bruteSpray adfs -t adfs.contoso.com -u john.doe@contoso.com  -p A
 		adfsOptions.NoBruteforce = noBruteforce
 		adfsOptions.Sleep = sleep
 		adfsOptions.Proxy = proxy
-		validUsers = adfsOptions.Brute()
+
+		orchestratorOptions := orchestrator.Orchestrator{}
+		orchestratorOptions.PreActionBruteforce = adfs.CheckTarget
+		orchestratorOptions.AuthenticationFunc = adfs.Authenticate
+		validUsers = orchestratorOptions.Bruteforce(&o365Options)
 	},
 }
 

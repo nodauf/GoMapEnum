@@ -2,7 +2,8 @@ package enum
 
 import (
 	"GoMapEnum/src/logger"
-	"GoMapEnum/src/teams"
+	"GoMapEnum/src/modules/teams"
+	"GoMapEnum/src/orchestrator"
 
 	"github.com/spf13/cobra"
 )
@@ -21,9 +22,13 @@ If these emails exist the presence of the user is retrieved as well as the devic
 		log := logger.New("Enumeration", "Teams", owaOptions.Target)
 		log.SetLevel(level)
 		log.Info("Starting the module Teams")
+		teamsOptions.Token = "Bearer " + teamsOptions.Token
 		teamsOptions.Log = log
 		teamsOptions.Proxy = proxy
-		validUsers = teamsOptions.UserEnum(log)
+
+		orchestratorOptions := orchestrator.Orchestrator{}
+		orchestratorOptions.UserEnumFunc = teams.UserEnum
+		validUsers = orchestratorOptions.UserEnum(&teamsOptions)
 	},
 }
 

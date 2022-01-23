@@ -2,7 +2,8 @@ package enum
 
 import (
 	"GoMapEnum/src/logger"
-	"GoMapEnum/src/owa"
+	"GoMapEnum/src/modules/owa"
+	"GoMapEnum/src/orchestrator"
 
 	"github.com/spf13/cobra"
 )
@@ -24,7 +25,11 @@ Credits: https://github.com/busterb/msmailprobe`,
 		log.Info("Starting the module OWA")
 		owaOptions.Log = log
 		owaOptions.Proxy = proxy
-		validUsers = owaOptions.UserEnum()
+
+		orchestratorOptions := orchestrator.Orchestrator{}
+		orchestratorOptions.PreActionUserEnum = owa.InitAndAverageResponseTime
+		orchestratorOptions.UserEnumFunc = owa.UserEnum
+		validUsers = orchestratorOptions.UserEnum(&owaOptions)
 
 	},
 }
