@@ -39,7 +39,7 @@ go run main.go bruteSpray adfs -t adfs.contoso.com -u john.doe@contoso.com  -p A
 		orchestratorOptions := orchestrator.Orchestrator{}
 		orchestratorOptions.PreActionBruteforce = adfs.CheckTarget
 		orchestratorOptions.AuthenticationFunc = adfs.Authenticate
-		validUsers = orchestratorOptions.Bruteforce(&o365Options)
+		validUsers = orchestratorOptions.Bruteforce(&adfsOptions)
 	},
 }
 

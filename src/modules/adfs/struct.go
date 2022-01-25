@@ -13,6 +13,10 @@ type Options struct {
 	utils.BaseOptions
 }
 
+func (options *Options) GetBaseOptions() *utils.BaseOptions {
+	return &options.BaseOptions
+}
+
 type userRealm struct {
 	AuthNForwardType        int64  `json:"AuthNForwardType"`
 	AuthURL                 string `json:"AuthURL"`
