@@ -10,7 +10,7 @@ func CheckTarget(optionsInterface *interface{}) {
 			log.Error("The ADFS URL was not found")
 			return
 		}
-		log.Verbose("An ADFS instance has been found on " + options.Target)
+		options.Log.Verbose("An ADFS instance has been found on " + options.Target)
 	}
 }
 
