@@ -68,7 +68,7 @@ Please note that no account locking mechanism can be implemented because no info
 This modules allows to enumeration users through the search features.
 
 #### User enumeration
-By default, an organization is reachable from another organization. Information can be retrieved such as first name, last name, presence status, out of office message,.... If no message is sent, the targeted user will not know that they have been searched. This can be useful to stealthily validate a list of target email addresses.
+By default, an organization is reachable from another organization. Information can be retrieved such as first name, last name, presence status, out of office message,.... If no message is sent, the targeted user will not know that they have been searched. This can be useful to stealthily validate a list of target email addresses, detect out of office users,...
 
 ![User enumeration on teams](./images/teams-UserEnum.png)
 
