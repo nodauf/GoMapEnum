@@ -3,6 +3,7 @@ package smtp
 import (
 	"GoMapEnum/src/utils"
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +14,15 @@ import (
 func PrepareSMTPConnections(optionsInterface *interface{}) {
 	options := (*optionsInterface).(*Options)
 	options.connectionsPool = make(chan *smtp.Client, options.Thread)
+
+	if options.Target == "" {
+		mxrecords, err := net.LookupMX(options.Domain)
+		if err != nil {
+			options.Log.Fatal("Not able to retrieve the MX for the domain " + options.Domain)
+		}
+		options.Target = mxrecords[0].Host
+	}
+
 	var nbConnectionsRequired int
 	nbConnectionsRequired = options.Thread
 	if len(options.UsernameList) < options.Thread {
