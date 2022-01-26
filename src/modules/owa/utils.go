@@ -89,7 +89,7 @@ func (options *Options) getURIToAuthenticate(host string) string {
 
 // webRequestCodeResponse request an URI and return the status code
 func (options *Options) webRequestCodeResponse(URI string) int {
-
+	options.Log.Debug("Checking " + URI)
 	timeout := time.Duration(3 * time.Second)
 	client := &http.Client{
 		Timeout:   timeout,
@@ -100,6 +100,7 @@ func (options *Options) webRequestCodeResponse(URI string) int {
 	resp, err := client.Do(req)
 	if err != nil {
 		options.Log.Error(err.Error())
+		return 0
 	}
 	return resp.StatusCode
 }
