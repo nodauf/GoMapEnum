@@ -36,7 +36,7 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error("Error on response.\n[ERRO] - " + err.Error())
+		options.Log.Error("Error on response.\n[ERRO] - " + err.Error())
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)
@@ -50,30 +50,30 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 	json.Unmarshal([]byte(body), &jsonInterface)
 	json.Unmarshal([]byte(body), &usefulInformation)
 
-	log.Debug("Status code: " + strconv.Itoa(resp.StatusCode))
+	options.Log.Debug("Status code: " + strconv.Itoa(resp.StatusCode))
 
 	bytes, _ := json.MarshalIndent(jsonInterface, "", " ")
-	log.Debug("Response: " + string(bytes))
+	options.Log.Debug("Response: " + string(bytes))
 
 	switch resp.StatusCode {
 	case 200:
 		if reflect.ValueOf(jsonInterface).Len() > 0 {
-			presence, device, outOfOfficeNote := options.getPresence(usefulInformation[0].Mri, options.Token, log)
-			log.Success(username + " - " + usefulInformation[0].DisplayName + " - " + presence + " - " + device + " - " + outOfOfficeNote)
+			presence, device, outOfOfficeNote := options.getPresence(usefulInformation[0].Mri, options.Token, options.Log)
+			options.Log.Success(username + " - " + usefulInformation[0].DisplayName + " - " + presence + " - " + device + " - " + outOfOfficeNote)
 			valid = true
 		} else {
-			log.Fail(username)
+			options.Log.Fail(username)
 		}
 		// If the status code is 403 it means the user exists but the organization did not enable connection from outside
 	case 403:
-		log.Success(username)
+		options.Log.Success(username)
 		valid = true
 	case 401:
-		log.Fail(username)
-		log.Info("The token may be invalid or expired. The status code returned by the server is 401")
+		options.Log.Fail(username)
+		options.Log.Info("The token may be invalid or expired. The status code returned by the server is 401")
 	default:
-		log.Fail(username)
-		log.Error("Something went wrong. The status code returned by the server is " + strconv.Itoa(resp.StatusCode))
+		options.Log.Fail(username)
+		options.Log.Error("Something went wrong. The status code returned by the server is " + strconv.Itoa(resp.StatusCode))
 	}
 	return valid
 }

@@ -28,7 +28,7 @@ func (options *Options) getPresence(mri, bearer string, log *logger.Logger) (str
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error("Error on response.\n[ERRO] - " + err.Error())
+		options.Log.Error("Error on response.\n[ERRO] - " + err.Error())
 		return "", "", ""
 	}
 
@@ -52,7 +52,7 @@ func (options *Options) getPresence(mri, bearer string, log *logger.Logger) (str
 
 	json.Unmarshal([]byte(body), &status)
 	bytes, _ := json.MarshalIndent(status, "", " ")
-	log.Debug("Response: " + string(bytes))
+	options.Log.Debug("Response: " + string(bytes))
 
 	if len(status) > 0 {
 		return status[0].Presence.Availability, status[0].Presence.DeviceType, status[0].Presence.CalendarData.OutOfOfficeNote.Message

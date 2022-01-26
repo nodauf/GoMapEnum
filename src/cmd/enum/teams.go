@@ -34,10 +34,10 @@ If these emails exist the presence of the user is retrieved as well as the devic
 
 func init() {
 
-	teamsCmd.Flags().StringVarP(&teamsOptions.Email, "email", "e", "", "Email or file containing the email address")
-	teamsCmd.Flags().StringVarP(&teamsOptions.Token, "token", "t", "", "Bearer token (only the base64 part: eyJ0...)")
+	teamsCmd.Flags().StringVarP(&teamsOptions.Users, "user", "u", "", "Email or file containing the email address")
+	teamsCmd.Flags().StringVarP(&teamsOptions.Token, "token", "t", "", "Bearer token (only the base64 part: eyJ0...). This token can be found on requests made to teams.microsoft.com/api/")
 	teamsCmd.Flags().IntVar(&teamsOptions.Thread, "thread", 1, "Number of threads")
 
 	teamsCmd.MarkFlagRequired("token")
-	teamsCmd.MarkFlagRequired("email")
+	teamsCmd.MarkFlagRequired("user")
 }
