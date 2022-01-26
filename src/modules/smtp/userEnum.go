@@ -20,8 +20,9 @@ func PrepareSMTPConnections(optionsInterface *interface{}) {
 		if err != nil {
 			options.Log.Fatal("Not able to retrieve the MX for the domain " + options.Domain)
 		}
-		options.Target = mxrecords[0].Host
+		options.Target = strings.TrimRight(mxrecords[0].Host, ".")
 	}
+	options.Log.Target = options.Target
 
 	var nbConnectionsRequired int
 	nbConnectionsRequired = options.Thread
