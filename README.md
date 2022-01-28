@@ -72,6 +72,9 @@ By default, an organization is reachable from another organization. Information 
 
 ![User enumeration on teams](./images/teams-UserEnum.png)
 
+### SMTP
+
+#### User enumeration
 
 ## TODO
 - [ ] Support Kerberos protocol
