@@ -36,7 +36,7 @@ var smtpCmd = &cobra.Command{
 func init() {
 
 	smtpCmd.Flags().StringVarP(&smtpOptions.Domain, "domain", "d", "", "Targeted domain ")
-	smtpCmd.Flags().StringVarP(&smtpOptions.Mode, "mode", "m", "", "RCPT, VRFY, EXPN (default: RCPT)")
+	smtpCmd.Flags().StringVarP(&smtpOptions.Mode, "mode", "m", "", "RCPT, VRFY, EXPN (default: all)")
 	smtpCmd.Flags().StringVarP(&smtpOptions.Users, "user", "u", "", "Username or file containing the usernames")
 	smtpCmd.Flags().StringVarP(&smtpOptions.Target, "target", "t", "", "Host pointing to the SMTP service. If not specified, the first SMTP server in the MX record will be targeted.")
 	smtpCmd.Flags().IntVar(&smtpOptions.Thread, "thread", 2, "Number of threads")

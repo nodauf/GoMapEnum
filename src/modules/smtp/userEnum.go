@@ -4,6 +4,7 @@ import (
 	"GoMapEnum/src/utils"
 	"fmt"
 	"net"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -26,7 +27,7 @@ func PrepareSMTPConnections(optionsInterface *interface{}) {
 
 	var nbConnectionsRequired int
 	nbConnectionsRequired = options.Thread
-	if len(options.UsernameList) < options.Thread {
+	if (options.Mode != "" && len(options.UsernameList) < options.Thread) || (options.Mode == "" && len(options.UsernameList)*3 < options.Thread) {
 		nbConnectionsRequired = len(options.UsernameList)
 	}
 	options.Log.Debug("Preparing a pool of " + strconv.Itoa(nbConnectionsRequired) + " connections")
@@ -53,7 +54,7 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 	valid := false
 	smtpConnection := <-options.connectionsPool
 	switch strings.ToLower(options.Mode) {
-	case "rcpt", "":
+	case "rcpt":
 		err := smtpConnection.Rcpt(username)
 		if err == nil {
 			options.Log.Success(username)
@@ -81,14 +82,39 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 			options.Log.Debug(username + " => " + err.Error())
 			options.Log.Fail(username)
 			// If the command is not implemented no need to pursue
-			if code == "502" {
+			if code == "502" && !options.all {
 				CloseSMTPConnections(optionsInterface)
-				options.Log.Fatal("The command is not implemented. No need to pursue using this method.")
+				options.Log.Fatal("The command EXPN is not implemented. No need to pursue using this method.")
 			}
-			fmt.Println(code)
 		}
+	case "":
+		options.connectionsPool <- smtpConnection
+		// Execute the 3 enumeration methods
+		options.all = true
+		// RCPT request
+		options.Log.Debug("No enumeration method specify. Executing enumeration with RCPT, VRFY and EXPN")
+		options.Log.Debug("Enumerate with RCPT")
+		options.Mode = "rcpt"
+		newOptionsInterface := reflect.ValueOf(options).Interface()
+		valid = UserEnum(&newOptionsInterface, username)
+		if valid {
+			return true
+		}
+		// VRFY
+		options.Log.Debug("Enumerate with VRFY")
+		options.Mode = "vrfy"
+		newOptionsInterface = reflect.ValueOf(options).Interface()
+		valid = UserEnum(&newOptionsInterface, username)
+		if valid {
+			return true
+		}
+		// EXPN
+		options.Log.Debug("Enumerate with EXPN")
+		options.Mode = "expn"
+		newOptionsInterface = reflect.ValueOf(options).Interface()
+		valid = UserEnum(&newOptionsInterface, username)
+		return valid
 	default:
-		CloseSMTPConnections(optionsInterface)
 		options.Log.Fatal("Unrecognised mode: " + options.Mode + ". Only RCPT, VRFY and EXPN are supported.")
 	}
 

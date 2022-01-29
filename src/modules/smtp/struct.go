@@ -13,6 +13,7 @@ type Options struct {
 	Mode   string
 	utils.BaseOptions
 
+	all             bool
 	connectionsPool chan *smtp.Client
 }
 
