@@ -88,30 +88,32 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 			}
 		}
 	case "":
+
+		optionsCopy := *options
 		options.connectionsPool <- smtpConnection
 		// Execute the 3 enumeration methods
-		options.all = true
+		optionsCopy.all = true
 		// RCPT request
 		options.Log.Debug("No enumeration method specify. Executing enumeration with RCPT, VRFY and EXPN")
 		options.Log.Debug("Enumerate with RCPT")
-		options.Mode = "rcpt"
-		newOptionsInterface := reflect.ValueOf(options).Interface()
+		optionsCopy.Mode = "rcpt"
+		newOptionsInterface := reflect.ValueOf(&optionsCopy).Interface()
 		valid = UserEnum(&newOptionsInterface, username)
 		if valid {
 			return true
 		}
 		// VRFY
 		options.Log.Debug("Enumerate with VRFY")
-		options.Mode = "vrfy"
-		newOptionsInterface = reflect.ValueOf(options).Interface()
+		optionsCopy.Mode = "vrfy"
+		newOptionsInterface = reflect.ValueOf(&optionsCopy).Interface()
 		valid = UserEnum(&newOptionsInterface, username)
 		if valid {
 			return true
 		}
 		// EXPN
 		options.Log.Debug("Enumerate with EXPN")
-		options.Mode = "expn"
-		newOptionsInterface = reflect.ValueOf(options).Interface()
+		optionsCopy.Mode = "expn"
+		newOptionsInterface = reflect.ValueOf(&optionsCopy).Interface()
 		valid = UserEnum(&newOptionsInterface, username)
 		return valid
 	default:
