@@ -70,11 +70,15 @@ This modules allows to enumeration users through the search features.
 #### User enumeration
 By default, an organization is reachable from another organization. Information can be retrieved such as first name, last name, presence status, out of office message,.... If no message is sent, the targeted user will not know that they have been searched. This can be useful to stealthily validate a list of target email addresses, detect out of office users,...
 
-![User enumeration on teams](./images/teams-UserEnum.png)
+![User enumeration on Teams](./images/teams-UserEnum.png)
 
 ### SMTP
 
 #### User enumeration
+
+SMTP servers can be vulnerable to a user enumeration weakness. Three differents techniques allows the user enumeration. The keyword **RCPT TO**, **VRFY** and **EXPN**. This module find the MX for the specified domain and by default will test the three methods to find valid users.
+
+![User enumeration on SMTP](./images/smtp-UserEnum.png)
 
 ## TODO
 - [ ] Support Kerberos protocol
