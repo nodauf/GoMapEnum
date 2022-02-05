@@ -87,14 +87,14 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 				options.Log.Fatal("The command EXPN is not implemented. No need to pursue using this method.")
 			}
 		}
-	case "":
+	case "", "all":
 
 		optionsCopy := *options
 		options.connectionsPool <- smtpConnection
 		// Execute the 3 enumeration methods
 		optionsCopy.all = true
 		// RCPT request
-		options.Log.Debug("No enumeration method specify. Executing enumeration with RCPT, VRFY and EXPN")
+		options.Log.Debug("No enumeration method specify. Executing enumeration with RCPT, VRFY, EXPN and ALL")
 		options.Log.Debug("Enumerate with RCPT")
 		optionsCopy.Mode = "rcpt"
 		newOptionsInterface := reflect.ValueOf(&optionsCopy).Interface()
