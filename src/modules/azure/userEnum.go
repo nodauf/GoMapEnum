@@ -3,6 +3,7 @@ package azure
 import (
 	"GoMapEnum/src/utils"
 	"bytes"
+	"crypto/tls"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -56,6 +57,13 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 		options.Log.Error("Only email format is supported, skipping " + username)
 		return false
 	}
+	client := &http.Client{
+
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy:           options.Proxy,
+		},
+	}
 	domain := strings.Split(username, "@")[1]
 	// Random password for authentication
 	password := utils.RandomString(10)
@@ -68,7 +76,6 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 	dataToSend := fmt.Sprintf(BASE_XML, created, expired, username, password)
 	url := fmt.Sprintf(AZURE_URL, domain, uuid)
 	req, _ := http.NewRequest("POST", url, bytes.NewBufferString(dataToSend))
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		options.Log.Error("Error on response.\n[ERRO] - " + err.Error())
