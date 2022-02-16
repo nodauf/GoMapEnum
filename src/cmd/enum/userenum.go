@@ -41,7 +41,7 @@ func init() {
 	UserenumCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
 	UserenumCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
 	UserenumCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
-	UserenumCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Sleep in seconds before sending an authentication request")
+	UserenumCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
 
 	// Add child
 	UserenumCmd.AddCommand(azureCmd)

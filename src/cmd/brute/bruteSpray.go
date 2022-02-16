@@ -44,7 +44,7 @@ func init() {
 	BruteSprayCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
 	BruteSprayCmd.PersistentFlags().BoolVarP(&noBruteforce, "no-bruteforce", "n", false, "No spray when using file for username and password (user1 => password1, user2 => password2)")
 	BruteSprayCmd.PersistentFlags().IntVarP(&sleep, "sleep", "s", 0, "Sleep in seconds before sending an authentication request")
-	BruteSprayCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Sleep in seconds before sending an authentication request")
+	BruteSprayCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
 
 	BruteSprayCmd.AddCommand(o365Cmd)
 	BruteSprayCmd.AddCommand(adfsCmd)
