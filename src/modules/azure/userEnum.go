@@ -107,11 +107,11 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 	case "AADSTS50076": // Due to a configuration change made by your administrator, or because you moved to a new location, you must use multi-factor authentication to access
 		options.Log.Info(username + " MFA needed")
 	case "AADSTS700016":
-		options.Log.Fail(username + " The application wasn't found in the directory/tenant")
+		options.Log.Error(username + " The application wasn't found in the directory/tenant")
 	case "AADSTS50034": // UserAccountNotFound - To sign into this application, the account must be added to the directory.
 		options.Log.Fail(username + " does not exist")
 	case "AADSTS90002":
-		options.Log.Fail("The Tenant '" + domain + "' does not exist")
+		options.Log.Error("The Tenant '" + domain + "' does not exist")
 	default:
 		options.Log.Error("Unknow error: " + structResponseAzure.Body.Fault.Detail.Error.Internalerror.Text)
 
