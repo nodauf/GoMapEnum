@@ -28,6 +28,10 @@ func CheckTenant(optionsInterface *interface{}, username string) bool {
 	if len(options.validTenants) == 0 {
 		options.validTenants = make(map[string]bool)
 	}
+	if len(strings.Split(username, "@")) == 1 {
+		options.Log.Error("User should be in format user@tenant.tld")
+		return false
+	}
 	domain := strings.Split(username, "@")[1]
 	// If we didn't already checked the domain
 	options.Mutex.Lock()
