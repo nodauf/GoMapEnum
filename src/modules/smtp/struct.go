@@ -13,8 +13,9 @@ type Options struct {
 	Mode   string
 	utils.BaseOptions
 
-	all             bool
-	connectionsPool chan *smtp.Client
+	all               bool
+	connectionsPool   chan *smtp.Client
+	expnNotRecognized bool
 }
 
 func (options *Options) GetBaseOptions() *utils.BaseOptions {
