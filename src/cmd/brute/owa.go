@@ -38,7 +38,7 @@ go run main.go bruteSpray owa -u john.doe@contoso.com -p Automn2021! -t mail.con
 
 func init() {
 
-	owaCmd.Flags().BoolVarP(&o365Options.CheckIfValid, "check", "c", true, "Check if the user is valid before trying password")
+	owaCmd.Flags().BoolVarP(&owaOptions.CheckIfValid, "check", "c", true, "Check if the user is valid before trying password")
 	owaCmd.Flags().StringVarP(&owaOptions.Users, "user", "u", "", "User or file containing the emails")
 	owaCmd.Flags().StringVarP(&owaOptions.Passwords, "password", "p", "", "Password or file containing the passwords")
 	owaCmd.Flags().StringVarP(&owaOptions.Target, "target", "t", "", "Host pointing to the OWA service")

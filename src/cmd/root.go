@@ -1,9 +1,11 @@
 package cmd
 
 import (
-	"GoMapEnum/src/cmd/brute"
-	"GoMapEnum/src/cmd/enum"
-	"GoMapEnum/src/cmd/gather"
+	"GoMapEnum/src/cmd/adfs"
+	"GoMapEnum/src/cmd/azure"
+	"GoMapEnum/src/cmd/o365"
+	"GoMapEnum/src/cmd/owa"
+	"GoMapEnum/src/cmd/smtp"
 	"fmt"
 	"os"
 
@@ -27,7 +29,13 @@ func Execute() {
 func init() {
 
 	// Add child
-	rootCmd.AddCommand(enum.UserenumCmd)
-	rootCmd.AddCommand(brute.BruteSprayCmd)
-	rootCmd.AddCommand(gather.GatherCmd)
+	//rootCmd.AddCommand(enum.UserenumCmd)
+	//rootCmd.AddCommand(brute.BruteSprayCmd)
+	//rootCmd.AddCommand(gather.GatherCmd)
+	// New module
+	rootCmd.AddCommand(azure.AzureCmd)
+	rootCmd.AddCommand(adfs.AdfsCmd)
+	rootCmd.AddCommand(o365.O365Cmd)
+	rootCmd.AddCommand(owa.OwaCmd)
+	rootCmd.AddCommand(smtp.SMTPCmd)
 }
