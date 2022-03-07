@@ -149,7 +149,7 @@ func CloseSMTPConnections(optionsInterface *interface{}) {
 		case smtpConnection := <-options.connectionsPool:
 			smtpConnection.Close()
 		case <-time.After(1 * time.Second):
-			options.Log.Debug("Something went wrong0 A connection seems already closed")
+			options.Log.Debug("Something went wrong. A connection seems already closed")
 		}
 
 	}
