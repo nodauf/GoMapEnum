@@ -144,7 +144,7 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 func CloseSMTPConnections(optionsInterface *interface{}) {
 	options := (*optionsInterface).(*Options)
 	options.Log.Debug("Closing the pool of connections")
-	for i := 1; i <= options.Thread; i++ {
+	for i := 1; i <= len(options.connectionsPool); i++ {
 		select {
 		case smtpConnection := <-options.connectionsPool:
 			smtpConnection.Close()
