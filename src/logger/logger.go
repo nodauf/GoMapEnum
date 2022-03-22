@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/fatih/color"
@@ -45,40 +46,45 @@ func (logger *Logger) SetLevel(level Level) {
 }
 
 // Debug print with debug output
-func (logger *Logger) Debug(str string) {
+func (logger *Logger) Debug(format string, a ...interface{}) {
 	if logger.Level >= DebugLevel {
+		str := fmt.Sprintf(format, a...)
 		output := color.HiMagentaString(str)
 		logger.print(output)
 	}
 }
 
 // Verbose print with verbose output
-func (logger *Logger) Verbose(str string) {
+func (logger *Logger) Verbose(format string, a ...interface{}) {
 	if logger.Level >= VerboseLevel {
+		str := fmt.Sprintf(format, a...)
 		output := color.HiYellowString(str)
 		logger.print(output)
 	}
 }
 
 // Info print with info output
-func (logger *Logger) Info(str string) {
+func (logger *Logger) Info(format string, a ...interface{}) {
 	if logger.Level >= InfoLevel {
+		str := fmt.Sprintf(format, a...)
 		output := color.HiYellowString(str)
 		logger.print(output)
 	}
 }
 
 // Error print with error output
-func (logger *Logger) Error(str string) {
+func (logger *Logger) Error(format string, a ...interface{}) {
 	if logger.Level >= ErrorLevel {
+		str := fmt.Sprintf(format, a...)
 		output := color.HiRedString("/!\\ " + str)
 		logger.print(output)
 	}
 }
 
 // Fatal print with fatal output
-func (logger *Logger) Fatal(str string) {
+func (logger *Logger) Fatal(format string, a ...interface{}) {
 	if logger.Level >= FatalLevel {
+		str := fmt.Sprintf(format, a...)
 		output := color.HiRedString("/!\\ " + str)
 		logger.print(output)
 	}
@@ -86,17 +92,18 @@ func (logger *Logger) Fatal(str string) {
 }
 
 // Success print with success output (mostly when password is true or user exists)
-func (logger *Logger) Success(str string) {
+func (logger *Logger) Success(format string, a ...interface{}) {
 	if logger.Level >= InfoLevel {
+		str := fmt.Sprintf(format, a...)
 		output := color.HiGreenString("[+] " + str)
 		logger.print(output)
 	}
 }
 
 // Fail print with fail output (mostly when password is wrong or user does not exist)
-func (logger *Logger) Fail(str string) {
-
+func (logger *Logger) Fail(format string, a ...interface{}) {
 	if logger.Level >= VerboseLevel {
+		str := fmt.Sprintf(format, a...)
 		output := color.HiRedString("[-] " + str)
 		logger.print(output)
 	}

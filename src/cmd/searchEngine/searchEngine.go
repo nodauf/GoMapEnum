@@ -1,7 +1,8 @@
-package azure
+package searchEngine
 
 import (
 	"GoMapEnum/src/logger"
+	"GoMapEnum/src/modules/searchEngine"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -13,16 +14,16 @@ import (
 var level logger.Level
 var verbose bool
 var debug bool
-var noBruteforce bool
-var sleep int
 var validUsers string
 var output string
 var proxyString string
 
-// AzureCmd represents the azure command
-var AzureCmd = &cobra.Command{
-	Use:   "azure",
-	Short: "Commands for azure module",
+var searchEngineOptions searchEngine.Options
+
+// SearchEngineCmd represents the bruteSpray command
+var SearchEngineCmd = &cobra.Command{
+	Use:   "searchEngine",
+	Short: "Commands for searchEngine module",
 	Long:  `Different services are supported. The authentication could be on an ADFS instance, an o365 or an OWA.`,
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if output != "" {
@@ -37,12 +38,12 @@ func init() {
 
 	cobra.OnInitialize(initLogger)
 	cobra.OnInitialize(initProxy)
-	AzureCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
-	AzureCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
-	AzureCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
-	AzureCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
+	SearchEngineCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
+	SearchEngineCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
+	SearchEngineCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
+	SearchEngineCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
 
-	AzureCmd.AddCommand(enumCmd)
+	SearchEngineCmd.AddCommand(gatherCmd)
 }
 
 func initLogger() {
@@ -63,6 +64,6 @@ func initProxy() {
 			fmt.Println("Fail to parse URL " + proxyString + " - error " + err.Error())
 			os.Exit(1)
 		}
-		azureOptions.ProxyHTTP = http.ProxyURL(url)
+		searchEngineOptions.ProxyHTTP = http.ProxyURL(url)
 	}
 }

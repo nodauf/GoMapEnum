@@ -20,7 +20,7 @@ func (options *Options) getCompany() linkedinListCompany {
 	header["csrf-token"] = "ajax:1337"
 	header["x-restli-protocol-version"] = "2.0.0"
 	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
-	body, statusCode, err := utils.GetBodyInWebsite(url, options.Proxy, header)
+	body, statusCode, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, header)
 	if err != nil {
 		if strings.Contains(err.Error(), "stopped after 10 redirects") {
 			log.Error("The session cookie may be wrong")
@@ -45,7 +45,7 @@ func (options *Options) getPeople(companyID, start int) []string {
 	header["x-restli-protocol-version"] = "2.0.0"
 	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
 
-	body, statusCode, err := utils.GetBodyInWebsite(url, options.Proxy, header)
+	body, statusCode, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, header)
 	if err != nil {
 		log.Error(err.Error())
 		return output

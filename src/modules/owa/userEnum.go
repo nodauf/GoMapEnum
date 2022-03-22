@@ -8,18 +8,19 @@ import (
 	"time"
 )
 
-func InitAndAverageResponseTime(optionsInterface *interface{}) {
+func InitAndAverageResponseTime(optionsInterface *interface{}) bool {
 	options := (*optionsInterface).(*Options)
 	// Prepare the transport for all the requests
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		Proxy:           options.Proxy,
+		Proxy:           options.ProxyHTTP,
 	}
 	options.tr = tr
 	options.urlToHarvest = options.getURIToAuthenticate(options.Target)
 	options.internalDomain = options.harvestInternalDomain(options.urlToHarvest)
 	options.avgResponse = options.basicAuthAvgTime(options.urlToHarvest, options.internalDomain)
 	options.Log.Info("Internal Domain: " + options.internalDomain)
+	return true
 }
 
 func UserEnum(optionsInterface *interface{}, username string) bool {

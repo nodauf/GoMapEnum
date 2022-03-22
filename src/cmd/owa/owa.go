@@ -14,8 +14,7 @@ import (
 var level logger.Level
 var verbose bool
 var debug bool
-var proxy func(*http.Request) (*url.URL, error)
-var validUsers []string
+var validUsers string
 var output string
 var proxyString string
 
@@ -26,6 +25,13 @@ var OwaCmd = &cobra.Command{
 	Use:   "owa",
 	Short: "Commands for owa module",
 	Long:  `Different services are supported. The authentication could be on an ADFS instance, an o365 or an OWA.`,
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		if output != "" {
+			if err := os.WriteFile(output, []byte(validUsers), 0666); err != nil {
+				fmt.Println(err)
+			}
+		}
+	},
 }
 
 func init() {
@@ -59,6 +65,6 @@ func initProxy() {
 			fmt.Println("Fail to parse URL " + proxyString + " - error " + err.Error())
 			os.Exit(1)
 		}
-		proxy = http.ProxyURL(url)
+		owaOptions.ProxyHTTP = http.ProxyURL(url)
 	}
 }

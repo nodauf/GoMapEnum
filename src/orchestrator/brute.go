@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) []string {
+func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 	var usernameList, passwordList []string
 	optionsInterface := reflect.ValueOf(optionsModules).Interface()
 	options := optionsModules.GetBaseOptions()
@@ -17,15 +17,16 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) []string {
 	var validUsers []string
 	mux := &sync.Mutex{}
 	if orchestrator.PreActionBruteforce != nil {
-		orchestrator.PreActionBruteforce(&optionsInterface)
+		if !orchestrator.PreActionBruteforce(&optionsInterface) {
+			return strings.Join(validUsers, "\n")
+		}
 	}
-
 	if options.CheckIfValid {
 		if orchestrator.CustomOptionsForCheckIfValid != nil {
 			optionsEnum := orchestrator.CustomOptionsForCheckIfValid(&optionsInterface)
-			usernameList = orchestrator.UserEnum(optionsEnum.(Options))
+			usernameList = strings.Split(orchestrator.UserEnum(optionsEnum.(Options)), "\n")
 		} else {
-			usernameList = orchestrator.UserEnum(optionsModules)
+			usernameList = strings.Split(orchestrator.UserEnum(optionsModules), "\n")
 		}
 	} else {
 		options.Users = utils.GetStringOrFile(options.Users)
@@ -41,6 +42,7 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) []string {
 			defer wg.Done()
 			var j = 0
 			for username := range queue {
+				found := false
 				options.Log.Verbose("Testing " + username)
 				if options.Sleep != 0 {
 					// Sleep to avoid detection and bypass rate-limiting
@@ -52,20 +54,29 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) []string {
 						mux.Lock()
 						validUsers = append(validUsers, username+" / "+passwordList[j])
 						mux.Unlock()
+						found = true
+						options.Log.Success(username + " / " + passwordList[j])
+					} else {
+						options.Log.Fail(username + " / " + passwordList[j])
 					}
-					//options.authenticate(email, passwordList[j], &nbLockout)
 				} else {
 					for _, password := range passwordList {
 						if orchestrator.AuthenticationFunc(&optionsInterface, username, password) {
 							mux.Lock()
 							validUsers = append(validUsers, username+" / "+password)
 							mux.Unlock()
+							found = true
+							options.Log.Success(username + " / " + password)
 							break // No need to continue if password is valid
+						} else {
+							options.Log.Fail(username + " / " + password)
 						}
 					}
 				}
 				j++
-				options.Log.Verbose("No password matched for " + username)
+				if !found {
+					options.Log.Verbose("No password matched for " + username)
+				}
 			}
 
 		}(i)
@@ -80,5 +91,10 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) []string {
 
 	close(queue)
 	wg.Wait()
-	return validUsers
+	if orchestrator.PostActionBruteforce != nil {
+		if !orchestrator.PostActionBruteforce(&optionsInterface) {
+			return strings.Join(validUsers, "\n")
+		}
+	}
+	return strings.Join(validUsers, "\n")
 }

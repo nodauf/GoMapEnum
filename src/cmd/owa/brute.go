@@ -15,14 +15,13 @@ var bruteCmd = &cobra.Command{
 	Long: `Authenticate with basic authentication on multiple endpoints. 
 Beware of account locking. No locking information is returned and therefore no failsafes could be set up.
 Credits: https://github.com/busterb/msmailprobe`,
-	Example: `go run main.go bruteSpray owa -u users -p pass -t mail.contoso.com -s 10 -o validUsers
-go run main.go bruteSpray owa -u john.doe@contoso.com -p Automn2021! -t mail.contoso.com -v`,
+	Example: `go run main.go owa brute -u users -p pass -t mail.contoso.com -s 10 -o validUsers
+go run main.go owa brute -u john.doe@contoso.com -p Automn2021! -t mail.contoso.com -v`,
 	Run: func(cmdCli *cobra.Command, args []string) {
 		log := logger.New("Bruteforce", "OWA", owaOptions.Target)
 		log.SetLevel(level)
 		log.Info("Starting the module OWA")
 		owaOptions.Log = log
-		owaOptions.Proxy = proxy
 
 		orchestratorOptions := orchestrator.Orchestrator{}
 		orchestratorOptions.PreActionBruteforce = owa.PrepareBruteforce

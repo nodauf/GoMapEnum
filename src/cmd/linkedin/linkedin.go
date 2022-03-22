@@ -1,7 +1,8 @@
-package adfs
+package linkedin
 
 import (
 	"GoMapEnum/src/logger"
+	"GoMapEnum/src/modules/linkedin"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -17,11 +18,13 @@ var validUsers string
 var output string
 var proxyString string
 
-// AdfsCmd represents the ADFS command
-var AdfsCmd = &cobra.Command{
-	Use:   "adfs",
-	Short: "Commands for ADFS module",
-	Long:  `ADFS (Active Directory Federation Service) is a role that can be installed on a windows server to provide Single Sign-on.`,
+var linkedinOptions linkedin.Options
+
+// LinkedinCmd represents the linkedin command
+var LinkedinCmd = &cobra.Command{
+	Use:   "linkedin",
+	Short: "Commands for linkedin module",
+	Long:  `Different services are supported. The authentication could be on an ADFS instance, an o365 or an OWA.`,
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if output != "" {
 			if err := os.WriteFile(output, []byte(validUsers), 0666); err != nil {
@@ -35,12 +38,12 @@ func init() {
 
 	cobra.OnInitialize(initLogger)
 	cobra.OnInitialize(initProxy)
-	AdfsCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
-	AdfsCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
-	AdfsCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
-	AdfsCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
+	LinkedinCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
+	LinkedinCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
+	LinkedinCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
+	LinkedinCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
 
-	AdfsCmd.AddCommand(bruteCmd)
+	LinkedinCmd.AddCommand(gatherCmd)
 }
 
 func initLogger() {
@@ -61,6 +64,6 @@ func initProxy() {
 			fmt.Println("Fail to parse URL " + proxyString + " - error " + err.Error())
 			os.Exit(1)
 		}
-		adfsOptions.ProxyHTTP = http.ProxyURL(url)
+		linkedinOptions.ProxyHTTP = http.ProxyURL(url)
 	}
 }

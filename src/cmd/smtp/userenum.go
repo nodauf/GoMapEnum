@@ -1,4 +1,4 @@
-package enum
+package smtp
 
 import (
 	"GoMapEnum/src/logger"
@@ -8,11 +8,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var smtpOptions smtp.Options
-
-// smtpCmd represents the smtp command
-var smtpCmd = &cobra.Command{
-	Use:   "smtp",
+// enum represents the smtp command
+var enumCmd = &cobra.Command{
+	Use:   "userenum",
 	Short: "Enumerate email address by connection to the smtp port of the target.",
 	Long: `SMTP user enumeration with RCPT, VRFY and EXPN.
 	Credits: https://github.com/cytopia/smtp-user-enum`,
@@ -22,7 +20,6 @@ var smtpCmd = &cobra.Command{
 		log.SetLevel(level)
 		log.Info("Starting the module SMTP")
 		smtpOptions.Log = log
-		smtpOptions.Proxy = proxy
 
 		orchestratorOptions := orchestrator.Orchestrator{}
 		orchestratorOptions.PreActionUserEnum = smtp.PrepareSMTPConnections
@@ -35,11 +32,10 @@ var smtpCmd = &cobra.Command{
 
 func init() {
 
-	smtpCmd.Flags().StringVarP(&smtpOptions.Domain, "domain", "d", "", "Targeted domain ")
-	smtpCmd.Flags().StringVarP(&smtpOptions.Mode, "mode", "m", "", "RCPT, VRFY, EXPN, ALL (default: all)")
-	smtpCmd.Flags().StringVarP(&smtpOptions.Users, "user", "u", "", "Username or file containing the usernames")
-	smtpCmd.Flags().StringVarP(&smtpOptions.Target, "target", "t", "", "Host pointing to the SMTP service. If not specified, the first SMTP server in the MX record will be targeted.")
-	smtpCmd.Flags().IntVar(&smtpOptions.Thread, "thread", 2, "Number of threads")
-	smtpCmd.MarkFlagRequired("user")
-	smtpCmd.MarkFlagRequired("domain")
+	enumCmd.Flags().StringVarP(&smtpOptions.Domain, "domain", "d", "", "Targeted domain ")
+	enumCmd.Flags().StringVarP(&smtpOptions.Mode, "mode", "m", "", "RCPT, VRFY, EXPN, ALL (default: all)")
+	enumCmd.Flags().StringVarP(&smtpOptions.Users, "user", "u", "", "Username or file containing the usernames")
+	enumCmd.Flags().StringVarP(&smtpOptions.Target, "target", "t", "", "Host pointing to the SMTP service. If not specified, the first SMTP server in the MX record will be targeted.")
+	enumCmd.Flags().IntVar(&smtpOptions.Thread, "thread", 2, "Number of threads")
+	enumCmd.MarkFlagRequired("user")
 }

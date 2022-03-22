@@ -10,17 +10,18 @@ func PrepareOptions(optionsInterface *interface{}) interface{} {
 	return *optionsInterface
 }
 
-func PrepareBruteforce(optionsInterface *interface{}) {
+func PrepareBruteforce(optionsInterface *interface{}) bool {
 	options := (*optionsInterface).(*Options)
 	// Prepare the transport for all the requests
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		Proxy:           options.Proxy,
+		Proxy:           options.ProxyHTTP,
 	}
 	options.tr = tr
 	options.urlToHarvest = options.getURIToAuthenticate(options.Target)
 	options.internalDomain = options.harvestInternalDomain(options.urlToHarvest)
 	options.Log.Info("Internal Domain: " + options.internalDomain)
+	return true
 }
 
 func Authenticate(optionsInterface *interface{}, email, password string) bool {

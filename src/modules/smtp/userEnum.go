@@ -10,14 +10,15 @@ import (
 	smtp "github.com/nodauf/net-smtp"
 )
 
-func PrepareSMTPConnections(optionsInterface *interface{}) {
+func PrepareSMTPConnections(optionsInterface *interface{}) bool {
 	options := (*optionsInterface).(*Options)
 	options.connectionsPool = make(chan *smtp.Client, options.Thread)
 
 	if options.Target == "" {
 		mxrecords, err := net.LookupMX(options.Domain)
 		if err != nil {
-			options.Log.Fatal("Not able to retrieve the MX for the domain " + options.Domain)
+			options.Log.Error("Not able to retrieve the MX for the domain " + options.Domain)
+			return false
 		}
 		options.Target = strings.TrimRight(mxrecords[0].Host, ".")
 	}
@@ -25,6 +26,7 @@ func PrepareSMTPConnections(optionsInterface *interface{}) {
 
 	var nbConnectionsRequired int
 	nbConnectionsRequired = options.Thread
+	// Get the required connections according to the threads settings and the mode
 	if (options.Mode != "" && len(options.UsernameList) < options.Thread) || (options.Mode == "" && len(options.UsernameList)*3 < options.Thread) {
 		nbConnectionsRequired = len(options.UsernameList)
 	}
@@ -33,8 +35,11 @@ func PrepareSMTPConnections(optionsInterface *interface{}) {
 		client := options.createNewConnection()
 		if client != nil {
 			options.connectionsPool <- client
+		} else {
+			options.Log.Error("Fail to open a connection to " + options.Target)
 		}
 	}
+	return true
 }
 
 func UserEnum(optionsInterface *interface{}, username string) bool {
@@ -141,7 +146,7 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 	return valid
 }
 
-func CloseSMTPConnections(optionsInterface *interface{}) {
+func CloseSMTPConnections(optionsInterface *interface{}) bool {
 	options := (*optionsInterface).(*Options)
 	options.Log.Debug("Closing the pool of connections")
 	for i := 1; i <= len(options.connectionsPool); i++ {
@@ -154,4 +159,5 @@ func CloseSMTPConnections(optionsInterface *interface{}) {
 
 	}
 	close(options.connectionsPool)
+	return true
 }

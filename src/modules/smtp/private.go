@@ -8,7 +8,7 @@ import (
 
 func (options *Options) prepareOneConnection(client *smtp.Client) error {
 
-	mailFrom := utils.RandomString(6) + "@" + options.Domain
+	mailFrom := utils.RandomString(6) + "@" + utils.RandomString(4) + "." + utils.RandomString(2)
 	err := client.Mail(mailFrom)
 	if err != nil {
 		//options.Log.Error("Mail From command failed with email:  " + mailFrom + " and error " + err.Error())

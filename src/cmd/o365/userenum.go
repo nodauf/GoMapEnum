@@ -6,7 +6,6 @@ import (
 	"GoMapEnum/src/orchestrator"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -24,15 +23,14 @@ var enumCmd = &cobra.Command{
 		log.SetLevel(level)
 		log.Info("Starting the module Azure")
 		o365Options.Log = log
-		o365Options.Proxy = proxy
 
 		orchestratorOptions := orchestrator.Orchestrator{}
 		orchestratorOptions.UserEnumFunc = o365.UserEnum
 		validUsers = orchestratorOptions.UserEnum(&o365Options)
 	},
-	PostRun: func(cmd *cobra.Command, args []string) {
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if output != "" {
-			if err := os.WriteFile(output, []byte(strings.Join(validUsers, "\n")), 0666); err != nil {
+			if err := os.WriteFile(output, []byte(validUsers), 0666); err != nil {
 				fmt.Println(err)
 			}
 		}

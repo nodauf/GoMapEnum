@@ -32,7 +32,7 @@ func (options *Options) brute(username, password string) bool {
 		},
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 
@@ -85,7 +85,7 @@ func (options *Options) brute(username, password string) bool {
 func (options *Options) findTarget(domain string) string {
 	var target string
 	url := fmt.Sprintf(FIND_ADFS_URL, domain)
-	body, _, err := utils.GetBodyInWebsite(url, options.Proxy, nil)
+	body, _, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, nil)
 	if err != nil {
 		options.Log.Error(err.Error())
 		return ""

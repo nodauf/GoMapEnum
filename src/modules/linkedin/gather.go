@@ -12,7 +12,7 @@ var LINKEDIN_LIST_COMPANY = "https://www.linkedin.com/voyager/api/voyagerSearchD
 var LINKEDIN_LIST_PEOPLE = "https://www.linkedin.com/voyager/api/search/dash/clusters?decorationId=com.linkedin.voyager.dash.deco.search.SearchClusterCollection-126&origin=COMPANY_PAGE_CANNED_SEARCH&q=all&query=(flagshipSearchIntent:SEARCH_SRP,queryParameters:(currentCompany:List(%d),resultType:List(PEOPLE)),includeFiltersInResponse:false)&start=%d"
 
 // Gather return a list of all users belongins to the specified company (or multiple companies if the search return more than one)
-func (options *Options) Gather() []string {
+func (options *Options) Gather() string {
 	var output []string
 	log = options.Log
 	// Always insensitive case compare
@@ -34,5 +34,5 @@ func (options *Options) Gather() []string {
 		}
 	}
 
-	return output
+	return strings.Join(output, "\n")
 }

@@ -7,17 +7,19 @@ import (
 	"sync"
 )
 
-func (orchestrator *Orchestrator) UserEnum(optionsModules Options) []string {
+func (orchestrator *Orchestrator) UserEnum(optionsModules Options) string {
 	optionsInterface := reflect.ValueOf(optionsModules).Interface()
 	options := optionsModules.GetBaseOptions()
 	options.Users = utils.GetStringOrFile(options.Users)
 	options.UsernameList = strings.Split(options.Users, "\n")
 	mux := &sync.Mutex{}
 	var wg sync.WaitGroup
-	var validusers []string
+	var validUsers []string
 	queue := make(chan string)
 	if orchestrator.PreActionUserEnum != nil {
-		orchestrator.PreActionUserEnum(&optionsInterface)
+		if !orchestrator.PreActionUserEnum(&optionsInterface) {
+			return strings.Join(validUsers, "\n")
+		}
 	}
 	for i := 0; i < options.Thread; i++ {
 
@@ -33,7 +35,7 @@ func (orchestrator *Orchestrator) UserEnum(optionsModules Options) []string {
 				}
 				if orchestrator.UserEnumFunc(&optionsInterface, username) {
 					mux.Lock()
-					validusers = append(validusers, username)
+					validUsers = append(validUsers, username)
 					mux.Unlock()
 				}
 			}
@@ -54,7 +56,9 @@ func (orchestrator *Orchestrator) UserEnum(optionsModules Options) []string {
 	close(queue)
 	wg.Wait()
 	if orchestrator.PostActionUserEnum != nil {
-		orchestrator.PostActionUserEnum(&optionsInterface)
+		if !orchestrator.PostActionUserEnum(&optionsInterface) {
+			return strings.Join(validUsers, "\n")
+		}
 	}
-	return validusers
+	return strings.Join(validUsers, "\n")
 }

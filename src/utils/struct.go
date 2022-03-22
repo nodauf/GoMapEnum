@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+
+	"golang.org/x/net/proxy"
 )
 
 // BaseOptions is the common options for the module
@@ -21,7 +23,8 @@ type BaseOptions struct {
 	Target           string
 	CheckIfValid     bool
 	Company          string
-	Proxy            func(*http.Request) (*url.URL, error)
+	ProxyHTTP        func(*http.Request) (*url.URL, error)
+	ProxyTCP         proxy.Dialer
 	Mutex            sync.Mutex
 }
 

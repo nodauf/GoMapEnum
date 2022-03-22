@@ -61,7 +61,7 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 	domain := strings.Split(username, "@")[1]

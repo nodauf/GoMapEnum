@@ -1,8 +1,8 @@
-package smtp
+package smb
 
 import (
 	"GoMapEnum/src/logger"
-	"GoMapEnum/src/modules/smtp"
+	"GoMapEnum/src/modules/smb"
 	"fmt"
 	"os"
 
@@ -16,12 +16,12 @@ var validUsers string
 var output string
 var proxyString string
 
-var smtpOptions smtp.Options
+var smbOptions smb.Options
 
-// SMTPCmd represents the owa command
-var SMTPCmd = &cobra.Command{
-	Use:   "smtp",
-	Short: "Commands for owa module",
+// SmbCmd represents the smb command
+var SmbCmd = &cobra.Command{
+	Use:   "smb",
+	Short: "Commands for smb module",
 	Long:  `Different services are supported. The authentication could be on an ADFS instance, an o365 or an OWA.`,
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if output != "" {
@@ -35,11 +35,12 @@ var SMTPCmd = &cobra.Command{
 func init() {
 
 	cobra.OnInitialize(initLogger)
-	SMTPCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
-	SMTPCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
-	SMTPCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
+	cobra.OnInitialize(initProxy)
+	SmbCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
+	SmbCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
+	SmbCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
 
-	SMTPCmd.AddCommand(enumCmd)
+	SmbCmd.AddCommand(bruteCmd)
 }
 
 func initLogger() {
@@ -51,4 +52,10 @@ func initLogger() {
 		level = logger.InfoLevel
 	}
 
+}
+
+func initProxy() {
+	if proxyString != "" {
+
+	}
 }

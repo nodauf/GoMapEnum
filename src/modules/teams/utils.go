@@ -23,7 +23,7 @@ func (options *Options) getPresence(mri, bearer string, log *logger.Logger) (str
 
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 	resp, err := client.Do(req)

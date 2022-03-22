@@ -93,7 +93,7 @@ func (options *Options) enumOffice(email string) bool {
 
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 	resp, err := client.Do(req)
@@ -243,7 +243,7 @@ func (options *Options) getDataInWebsite(url, header string, regexes ...string) 
 
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 	resp, err := client.Do(req)
@@ -272,7 +272,7 @@ func (options *Options) validTenant(domain string) bool {
 
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 	resp, err := client.Do(req)
@@ -306,7 +306,7 @@ func (options *Options) requestOauth2(username, password string) oauth2Output {
 
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 	resp, err := client.Do(req)

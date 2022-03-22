@@ -1,4 +1,4 @@
-package searchengine
+package searchEngine
 
 import (
 	"GoMapEnum/src/utils"
@@ -22,7 +22,7 @@ var REGEX_LINKEDIN = map[string]string{"google": `<h[23](.*?")?>(?P<FirstName>.*
 	"bing": `<h[23](.*?")?>(?P<FirstName>.*?) (?P<LastName>.*?) [-–] (?P<Title>.*?) [-–] (?P<Company>.*?)(\| LinkedIn)(.*?)<\/h[23]>`}
 
 // Gather will search a company name and returned the list of people in specified format
-func (options *Options) Gather() []string {
+func (options *Options) Gather() string {
 	var output []string
 	var nbFoundEmail int
 	var searchEngineToUse []string
@@ -53,7 +53,7 @@ func (options *Options) Gather() []string {
 			url := fmt.Sprintf(formatUrl, options.Company, startSearch)
 			log.Debug("URL: " + url)
 			// Get the results of the search
-			body, statusCode, err := utils.GetBodyInWebsite(url, options.Proxy, nil)
+			body, statusCode, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, nil)
 			if err != nil {
 				log.Error(err.Error())
 				continue
@@ -101,5 +101,5 @@ func (options *Options) Gather() []string {
 	}
 	output = utils.UniqueSliceString(output)
 	log.Verbose("Total emails collected: " + strconv.Itoa(len(output)))
-	return output
+	return strings.Join(output, "\n")
 }

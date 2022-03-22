@@ -31,7 +31,7 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           options.Proxy,
+			Proxy:           options.ProxyHTTP,
 		},
 	}
 	resp, err := client.Do(req)
