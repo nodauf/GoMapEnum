@@ -162,3 +162,13 @@ func GetKeysMap(m map[string]string) []string {
 	}
 	return keys
 }
+
+// IndexInSlice returns the index of the element in the given slice. If the element is not found it returns -1
+func IndexInSlice(slice []string, value string) int {
+	for p, v := range slice {
+		if v == value {
+			return p
+		}
+	}
+	return -1
+}

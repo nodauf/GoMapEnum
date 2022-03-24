@@ -40,7 +40,6 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			var j = 0
 			for username := range queue {
 				found := false
 				options.Log.Verbose("Testing " + username)
@@ -50,14 +49,15 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 					time.Sleep(time.Duration(options.Sleep) * time.Second)
 				}
 				if options.NoBruteforce {
-					if orchestrator.AuthenticationFunc(&optionsInterface, username, passwordList[j]) {
+					index := utils.IndexInSlice(usernameList, username)
+					if orchestrator.AuthenticationFunc(&optionsInterface, username, passwordList[index]) {
 						mux.Lock()
-						validUsers = append(validUsers, username+" / "+passwordList[j])
+						validUsers = append(validUsers, username+" / "+passwordList[index])
 						mux.Unlock()
 						found = true
-						options.Log.Success(username + " / " + passwordList[j])
+						options.Log.Success(username + " / " + passwordList[index])
 					} else {
-						options.Log.Fail(username + " / " + passwordList[j])
+						options.Log.Fail(username + " / " + passwordList[index])
 					}
 				} else {
 					for _, password := range passwordList {
@@ -73,7 +73,6 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 						}
 					}
 				}
-				j++
 				if !found {
 					options.Log.Verbose("No password matched for " + username)
 				}
