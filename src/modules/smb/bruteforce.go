@@ -89,7 +89,7 @@ func GetTargetInfo(target string, timeout int) (string, string, error) {
 	if err != nil || smbConnection == nil {
 		errStr := "Fail to connect to " + target
 		if err != nil {
-			errStr += err.Error()
+			errStr += " " + err.Error()
 		}
 		return "", "", fmt.Errorf(errStr)
 	}
