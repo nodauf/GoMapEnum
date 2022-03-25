@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,13 +15,17 @@ import (
 func RetrieveTargetInfo(optionsInterface *interface{}) bool {
 	options := (*optionsInterface).(*Options)
 	var err error
-	if options.Domain == "" {
-		options.Domain, options.Hostname, err = GetTargetInfo(options.Target, options.Timeout)
-		if err != nil {
-			options.Log.Error("Fail to connect to smb to retrieve the domain name: %s. Please provide the domain with -d flag.", err.Error())
-			return false
-		}
+	var domain string
+	domain, options.Hostname, err = GetTargetInfo(options.Target, options.Timeout)
+	if err != nil {
+		options.Log.Error("Fail to connect to smb to retrieve the domain name and hostname. Please provide the domain with -d flag.", err.Error())
+		return false
 	}
+	if options.Domain == "" {
+		options.Domain = domain
+	}
+
+	options.Log.Verbose("Using domain " + options.Domain + " for authentication. Hostname: " + options.Hostname)
 	return true
 }
 func Authenticate(optionsInterface *interface{}, username, password string) bool {
@@ -43,8 +48,6 @@ func Authenticate(optionsInterface *interface{}, username, password string) bool
 	}
 
 	defer (smbConnection).Close()
-
-	options.Log.Verbose("Using domain " + options.Domain + " for authentication. Hostname: " + options.Hostname)
 
 	var smbDialer = &smb2.Dialer{}
 	if options.IsHash {
@@ -72,6 +75,16 @@ func Authenticate(optionsInterface *interface{}, username, password string) bool
 	}
 	s, err := smbDialer.Dial(smbConnection)
 	if err != nil {
+		if strings.Contains(err.Error(), "The user account has been automatically locked because too many invalid logon attempts or password change attempts have been requested") {
+			options.Log.Error("The account %s is locked", username)
+			options.lockoutCounter++
+		}
+		// Fail safe to avoid locking to many account
+		if options.lockoutCounter >= options.LockoutThreshold {
+			options.Log.Fatal("Too many lockout: " + strconv.Itoa(options.lockoutCounter) + " >= " + strconv.Itoa(options.LockoutThreshold))
+		}
+
+		// If it is another error
 		if !strings.Contains(err.Error(), "The attempted logon is invalid. This is either due to a bad username or authentication information.") {
 			options.Log.Error(err.Error())
 		}

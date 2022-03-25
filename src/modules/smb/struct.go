@@ -11,8 +11,9 @@ type Options struct {
 	Domain   string
 	Hostname string
 	utils.BaseOptions
-
 	IsHash bool
+
+	lockoutCounter int
 }
 
 func (options *Options) GetBaseOptions() *utils.BaseOptions {
