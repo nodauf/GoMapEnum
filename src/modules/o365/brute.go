@@ -30,7 +30,7 @@ func PrepareOptions(optionsInterface *interface{}) interface{} {
 	return reflect.ValueOf(optionsEnum).Interface()
 }
 
-// brute will be called to test an authentication and use the specified mode and check the lockout
+// Authenticate will be called to test an authentication and use the specified mode and check the lockout
 func Authenticate(optionsInterface *interface{}, email, password string) bool {
 	options := (*optionsInterface).(*Options)
 	var valid bool
@@ -39,6 +39,7 @@ func Authenticate(optionsInterface *interface{}, email, password string) bool {
 	case "oauth2":
 		valid, err = options.bruteOauth2(email, password)
 		if err != nil && errors.Is(utils.ErrLockout, err) {
+			options.Log.Error("The account %s is locked", email)
 			options.lockoutCounter++
 		}
 		// Fail safe to avoid locking to many account
