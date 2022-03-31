@@ -97,8 +97,8 @@ func establisheConnection(target string, TLS bool, timeout int, proxyTCP proxy.D
 	if proxyTCP != nil {
 		conn, err = proxyTCP.Dial("tcp", fmt.Sprintf("%s:%s", target, port))
 	} else {
-		defaultDailer := &net.Dialer{Timeout: time.Duration(timeout * int(time.Second))}
-		conn, err = defaultDailer.Dial("tcp", fmt.Sprintf("%s:%s", target, ldap.DefaultLdapPort))
+		defaultDialer := &net.Dialer{Timeout: time.Duration(timeout * int(time.Second))}
+		conn, err = defaultDialer.Dial("tcp", fmt.Sprintf("%s:%s", target, ldap.DefaultLdapPort))
 	}
 	// Check if connection is successful
 	if err != nil {
