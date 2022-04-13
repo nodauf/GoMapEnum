@@ -38,7 +38,6 @@ By default, if one account is being lock, the all attack will be stopped.
 		orchestratorOptions.UserEnumFunc = o365.UserEnum
 		// To check if the user is valid
 		orchestratorOptions.CheckBeforeEnumFunc = o365.CheckTenant
-		orchestratorOptions.AuthenticationFunc = o365.Authenticate
 		validUsers = orchestratorOptions.Bruteforce(&o365Options)
 	},
 }
