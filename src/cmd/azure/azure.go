@@ -23,7 +23,7 @@ var proxyString string
 var AzureCmd = &cobra.Command{
 	Use:   "azure",
 	Short: "Commands for azure module",
-	Long:  `Different services are supported. The authentication could be on an ADFS instance, an o365 or an OWA.`,
+	Long:  `Authentication on Azure could be used to enumerate valid user or not by trying to authenticate.`,
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if output != "" {
 			if err := os.WriteFile(output, []byte(validUsers), 0666); err != nil {

@@ -5,17 +5,16 @@ import (
 	"GoMapEnum/src/modules/ldap"
 	"GoMapEnum/src/orchestrator"
 
-	ldaplib "github.com/go-ldap/ldap/v3"
 	"github.com/spf13/cobra"
 )
 
 // bruteCmd represents the owa command
 var bruteCmd = &cobra.Command{
 	Use:   "brute",
-	Short: "Authenticate on LDAP",
+	Short: "Bruteforce or spray password on a LDAP service",
 	Long:  ``,
-	Example: `go run main.go owa brute -u users -p pass -t mail.contoso.com -s 10 -o validUsers
-go run main.go owa brute -u john.doe@contoso.com -p Automn2021! -t mail.contoso.com -v`,
+	Example: `go run main.go ldap brute -u users -p pass -t 192.168.1.175 -v -s 10 -o validUsers
+go run main.go ldap brute -u john.doe -p securePassword1 -d CONTOSO -t 192.168.1.175 -v -s 10 -o validUsers`,
 
 	Run: func(cmdCli *cobra.Command, args []string) {
 		log := logger.New("Bruteforce", "LDAP", ldapOptions.Target)
@@ -41,7 +40,6 @@ func init() {
 
 	bruteCmd.Flags().BoolVarP(&ldapOptions.NoBruteforce, "no-bruteforce", "n", false, "No spray when using file for username and password (user1 => password1, user2 => password2)")
 	bruteCmd.Flags().IntVar(&ldapOptions.Thread, "thread", 2, "Number of threads")
-	bruteCmd.Flags().IntVar(&ldapOptions.Timeout, "timeout", int(ldaplib.DefaultTimeout.Seconds()), "Timeout for the SMB connection in seconds")
 	bruteCmd.Flags().IntVarP(&ldapOptions.Sleep, "sleep", "s", 0, "Sleep in seconds before sending an authentication request")
 
 }

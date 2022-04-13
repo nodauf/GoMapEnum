@@ -13,7 +13,7 @@ var gatherCmd = &cobra.Command{
 	Short: "Search on Linkedin for people working in the specified company",
 	Long: `Firstly, it will search for company based on the provided name and then list all the people working at these companies and print them in the specified format.
 The session cookie is needed to use the Linkedin features.`,
-	Example: `go run main.go gather linkedin -c contoso -f "{f}{last}@contonso.com" -e -s AQEDA...`,
+	Example: `go run main.go linkedin gather -c contoso -f "{f}{last}@contonso.com" -e -s AQEDA...`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if linkedinOptions.Format == "" && linkedinOptions.Email {
 			return errors.New("format flag is requre when email should be guess")

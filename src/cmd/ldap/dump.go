@@ -4,7 +4,6 @@ import (
 	"GoMapEnum/src/logger"
 	"errors"
 
-	ldaplib "github.com/go-ldap/ldap/v3"
 	"github.com/spf13/cobra"
 )
 
@@ -12,9 +11,9 @@ import (
 var dumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Dump LDAP datas",
-	Long:  ``,
-	Example: `go run main.go owa brute -u users -p pass -t mail.contoso.com -s 10 -o validUsers
-go run main.go owa brute -u john.doe@contoso.com -p Automn2021! -t mail.contoso.com -v`,
+	Long:  `Several LDAP requests has been implemented to dump various of data`,
+	Example: `go run main.go ldap dump -t 192.168.1.175 -u user -p securePassword --dump computers,users
+	go run main.go ldap dump -t 192.168.1.175 -u user -p securePassword --dump all`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if ldapOptions.Passwords == "" && ldapOptions.Hash == "" {
 			return errors.New("The field password or hash is required")
@@ -45,7 +44,6 @@ func init() {
 	dumpCmd.Flags().StringVarP(&ldapOptions.BaseDN, "baseDN", "b", "", "The base DN for all ldap queries. Default it will be the defaultNamingContext")
 	dumpCmd.Flags().StringVar(&ldapOptions.DumpObjects, "dump", "", "Dump objects among computers,users. Could be 'all' keyword  (ex: computers,users)")
 	dumpCmd.Flags().IntVar(&ldapOptions.Thread, "thread", 2, "Number of threads")
-	dumpCmd.Flags().IntVar(&ldapOptions.Timeout, "timeout", int(ldaplib.DefaultTimeout.Seconds()), "Timeout for the SMB connection in seconds")
 	dumpCmd.Flags().IntVarP(&ldapOptions.Sleep, "sleep", "s", 0, "Sleep in seconds before sending an authentication request")
 
 }
