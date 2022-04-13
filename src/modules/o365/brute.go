@@ -11,7 +11,6 @@ import (
 func PrepareOptions(optionsInterface *interface{}) interface{} {
 	options := (*optionsInterface).(*Options)
 
-	options.Log.Debug("Validating the users")
 	var optionsEnum = new(Options)
 	*optionsEnum = *options
 	var tmpLogger logger.Logger

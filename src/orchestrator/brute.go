@@ -22,6 +22,7 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 		}
 	}
 	if options.CheckIfValid {
+		options.Log.Debug("Validating the users")
 		if orchestrator.CustomOptionsForCheckIfValid != nil {
 			optionsEnum := orchestrator.CustomOptionsForCheckIfValid(&optionsInterface)
 			usernameList = strings.Split(orchestrator.UserEnum(optionsEnum.(Options)), "\n")
