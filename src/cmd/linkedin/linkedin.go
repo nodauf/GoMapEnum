@@ -24,7 +24,7 @@ var linkedinOptions linkedin.Options
 var LinkedinCmd = &cobra.Command{
 	Use:   "linkedin",
 	Short: "Commands for linkedin module",
-	Long:  `Different services are supported. The authentication could be on an ADFS instance, an o365 or an OWA.`,
+	Long:  `Use linkedin API with the session cookie to an actions.`,
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if output != "" {
 			if err := os.WriteFile(output, []byte(validUsers), 0666); err != nil {
