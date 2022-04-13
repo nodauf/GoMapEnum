@@ -69,7 +69,7 @@ func (options *Options) brute(username, password string) bool {
 	options.Log.Debug("Status code: " + strconv.Itoa(resp.StatusCode))
 	// Parse the response to know if the password match
 	if resp.StatusCode == 302 {
-		options.Log.Success(username + " and " + password + " matched")
+		//options.Log.Success(username + " and " + password + " matched")
 		return true
 	} else if strings.Contains(string(body), "Your password has expired") {
 		options.Log.Success(username + " and " + password + " matched but the password is expired")
