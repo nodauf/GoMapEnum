@@ -4,9 +4,12 @@ import (
 	"GoMapEnum/src/logger"
 	"GoMapEnum/src/modules/smtp"
 	"fmt"
+	"net"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/net/proxy"
 )
 
 var level logger.Level
@@ -35,9 +38,12 @@ var SMTPCmd = &cobra.Command{
 func init() {
 
 	cobra.OnInitialize(initLogger)
+	cobra.OnInitialize(initProxy)
 	SMTPCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
 	SMTPCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
 	SMTPCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
+	SMTPCmd.PersistentFlags().IntVar(&smtpOptions.Timeout, "timeout", 2, "Timeout for the SMTP connection in seconds")
+	SMTPCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
 
 	SMTPCmd.AddCommand(enumCmd)
 }
@@ -51,4 +57,16 @@ func initLogger() {
 		level = logger.InfoLevel
 	}
 
+}
+
+func initProxy() {
+	if proxyString != "" {
+		var err error
+		defaultDailer := &net.Dialer{Timeout: time.Duration(smtpOptions.Timeout * int(time.Second))}
+		smtpOptions.ProxyTCP, err = proxy.SOCKS5("tcp", proxyString, nil, defaultDailer)
+		if err != nil {
+			fmt.Println("fail to use the proxy " + proxyString + ": " + err.Error())
+			os.Exit(1)
+		}
+	}
 }

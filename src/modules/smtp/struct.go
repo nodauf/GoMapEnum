@@ -8,9 +8,10 @@ import (
 
 // Options for o365 module
 type Options struct {
-	Target string
-	Domain string
-	Mode   string
+	Timeout int
+	Target  string
+	Domain  string
+	Mode    string
 	utils.BaseOptions
 
 	all               bool
