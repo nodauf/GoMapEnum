@@ -45,6 +45,7 @@ func init() {
 
 	O365Cmd.AddCommand(bruteCmd)
 	O365Cmd.AddCommand(enumCmd)
+	O365Cmd.AddCommand(dumpCmd)
 }
 
 func initLogger() {

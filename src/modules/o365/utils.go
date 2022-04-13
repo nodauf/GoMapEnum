@@ -4,11 +4,14 @@ import (
 	"GoMapEnum/src/utils"
 	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"reflect"
 	"regexp"
 	"strings"
 )
@@ -217,7 +220,7 @@ func (options *Options) bruteOauth2(username, password string) (bool, error) {
 		}
 	} else if respStruct.AccessToken != "" {
 		valid = true
-		options.Log.Success(username + " / " + password + " matched")
+		//options.Log.Success(username + " / " + password + " matched")
 
 	}
 	if !valid {
@@ -318,4 +321,106 @@ func (options *Options) requestOauth2(username, password string) oauth2Output {
 	json.Unmarshal(body, &respStruct)
 
 	return respStruct
+}
+
+// dumpO365ObjectPaging dump the O365 datas.
+func dumpO365ObjectPaging(url string, proxy func(*http.Request) (*url.URL, error), headers map[string]string) (interface{}, error) {
+	type genericStruct struct {
+		Odata_metadata string        `json:"odata.metadata"`
+		Odata_nextLink string        `json:"odata.nextLink"`
+		Value          []interface{} `json:"value"`
+	}
+	var allResults genericStruct
+	for url != "" {
+		var tempResult genericStruct
+		jsonData, statusCode, err := utils.GetBodyInWebsite(url, proxy, headers)
+		if err != nil {
+			return "", fmt.Errorf("cannot request the URL %s, error %s (status code: %d)", url, err.Error(), statusCode)
+		}
+
+		json.Unmarshal([]byte(jsonData), &tempResult)
+		allResults.Value = append(allResults.Value, tempResult.Value...)
+		if tempResult.Odata_nextLink == "" {
+			break
+		}
+		url = nextURL(tempResult.Odata_nextLink, url)
+	}
+
+	return allResults, nil
+}
+
+// From https://github.com/dirkjanm/ROADtools/blob/8629c6c170199d9e79060dd6b7741751a95efe71/roadrecon/roadtools/roadrecon/gather.py#L37
+func nextURL(url, prevURL string) string {
+	if strings.HasPrefix(url, "https://") {
+		return url + "&api-version=1.61-internal"
+	}
+	parts := strings.Split(prevURL, "/")
+	if utils.StringInSlice(parts, "directoryObjects") {
+		return strings.Join(parts[0:4], "/") + "/" + url + "&api-version=1.61-internal"
+	}
+	return strings.Join(parts[0:len(parts)-1], "/") + "/" + url + "&api-version=1.61-internal"
+}
+
+func getTenantIDFromAccessToken(accessToken string) (string, error) {
+	payloadBase64 := strings.Split(accessToken, ".")[1]
+	if l := len(payloadBase64) % 4; l > 0 {
+		payloadBase64 += strings.Repeat("=", 4-l)
+	}
+	payload, _ := base64.StdEncoding.DecodeString(payloadBase64)
+	/*if err != nil {
+		return "", fmt.Errorf("cannot base64 decode the access token %s", payload)
+	}*/
+
+	tenantID := struct {
+		Tid string `json:"tid"`
+	}{}
+	err := json.Unmarshal(payload, &tenantID)
+	if err != nil {
+		return "", fmt.Errorf("cannot decode the json to the struct: %s", err.Error())
+	}
+	return tenantID.Tid, nil
+}
+
+/*func parseUsers(users Users) interface{} {
+	type dataStruct struct {
+		DisplayName string
+		Mail        string
+	}
+	var data []dataStruct
+	for _, value := range users.Value {
+		var row dataStruct
+		row.DisplayName = value.DisplayName
+		row.Mail = value.Mail
+		data = append(data, row)
+	}
+	return data
+}*/
+/*func parseUsers(users Users, columns []string) [][]string {
+
+	var data [][]string
+	for _, value := range users.Value {
+		var row []string
+		row = append(row, value.DisplayName)
+		row = append(row, value.Mail)
+		data = append(data, row)
+	}
+	return data
+}*/
+
+// parseO365Data get a structure that represente the data of each row and a slice of string that represent the field to retrieve inside the struct
+func parseO365Data(allData interface{}, columns []string) [][]string {
+	var data [][]string
+	v := reflect.ValueOf(allData)
+	// for each item in slice ( = for each row of the table)
+	for i := 0; i < v.Len(); i++ {
+		item := v.Index(i)
+		var row []string
+		for _, col := range columns {
+			row = append(row, utils.SearchInStruct(item, col))
+		}
+		data = append(data, row)
+
+	}
+
+	return data
 }
