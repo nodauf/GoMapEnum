@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	ldaplib "github.com/go-ldap/ldap/v3"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/proxy"
 )
@@ -28,7 +29,8 @@ var ldapOptions ldap.Options
 var LdapCmd = &cobra.Command{
 	Use:   "ldap",
 	Short: "Commands for ldap module",
-	Long:  `Different services are supported. The authentication could be on an ADFS instance, an o365 or an OWA.`,
+	Long: `LDAP servers are an important part of the internal network.
+The authentication can be bruteforce and with valid credentials a lot of data could be retrieved and parse`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if ldapOptions.Passwords == "" && ldapOptions.Hash == "" {
 			return errors.New("The field password or hash is required")
@@ -54,13 +56,15 @@ func init() {
 	LdapCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
 	LdapCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
 	LdapCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
-	LdapCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
+	LdapCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "P roxy to use (ex: http://localhost:8080)")
 	LdapCmd.PersistentFlags().BoolVar(&ldapOptions.TLS, "TLS", false, "Enable TLS")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Users, "user", "u", "", "User or file containing the emails")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Passwords, "password", "p", "", "Password or file containing the passwords")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Hash, "hash", "H", "", "Hash or file containing the hashes")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Target, "target", "t", "", "Host pointing to the LDAP server")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Domain, "domain", "d", "", "Domain for the authentication (by default the domain name will be guessed with a smb connection)")
+	dumpCmd.Flags().IntVar(&ldapOptions.Timeout, "timeout", int(ldaplib.DefaultTimeout.Seconds()), "Timeout for the LDAP connection in seconds")
+
 	LdapCmd.MarkFlagRequired("target")
 	LdapCmd.MarkFlagRequired("user")
 

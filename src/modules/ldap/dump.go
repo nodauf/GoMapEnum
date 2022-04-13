@@ -9,19 +9,6 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-func (options *Options) initDumpMap() {
-	options.queries = make(map[string]map[string]string)
-
-	computers := make(map[string]string)
-	computers["filter"] = "(objectClass=Computer)"
-	computers["attributs"] = "cn,dNSHostName,operatingSystem,operatingSystemVersion,operatingSystemServicePack,whenCreated,lastLogon,objectSid,objectClass"
-	options.queries["computers"] = computers
-
-	users := make(map[string]string)
-	users["filter"] = "(objectClass=user)"
-	users["attributs"] = "cn,sAMAccountName,userPrincipalName,objectClass"
-	options.queries["users"] = users
-}
 func (options *Options) Dump() string {
 	optionsInterface := reflect.ValueOf(options).Interface()
 	options.initDumpMap()
