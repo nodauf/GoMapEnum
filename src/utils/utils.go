@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -171,4 +173,80 @@ func IndexInSlice(slice []string, value string) int {
 		}
 	}
 	return -1
+}
+
+func StringInSlice(sliceStr []string, str string) bool {
+	for _, value := range sliceStr {
+		if value == str {
+			return true
+		}
+	}
+	return false
+}
+
+/*func DataToHTML(dataTable interface{}, title string) bytes.Buffer {
+	var columns []string
+	v := reflect.ValueOf(dataTable).Type().Elem()
+	for i := 0; i < v.NumField(); i++ {
+		columns = append(columns, v.Field(i).Name)
+	}
+	var tpl bytes.Buffer
+	t, _ := template.ParseFiles("template/datatables.tpl")
+	//f, _ := os.Create("users.html")
+
+	data := struct {
+		DataTable interface{}
+		Columns   []string
+		Title     string
+	}{
+		DataTable: dataTable,
+		Columns:   columns,
+		Title:     title,
+	}
+	t.Execute(&tpl, data)
+	return tpl
+}*/
+func DataToHTML(rows [][]string, columns []string, title string) bytes.Buffer {
+
+	var tpl bytes.Buffer
+	customFunctions := template.FuncMap{
+		"replace": func(input, from, to string) string { return strings.Replace(input, from, to, -1) },
+	}
+
+	t, _ := template.New("datatables.tpl").Funcs(customFunctions).ParseFiles("template/datatables.tpl")
+	//t, err := template.ParseFiles("template/datatables.tpl")
+	//f, _ := os.Create("users.html")
+
+	data := struct {
+		Rows    [][]string
+		Columns []string
+		Title   string
+	}{
+		Rows:    rows,
+		Columns: columns,
+		Title:   title,
+	}
+	t.Execute(&tpl, data)
+	return tpl
+}
+
+func SearchInStruct(item reflect.Value, column string) string {
+	var element string
+
+	switch item.FieldByName(column).Type().Kind() {
+	case reflect.Slice:
+		var dataSlice string
+		for j := 0; j < item.FieldByName(column).Len(); j++ {
+
+			dataSlice += item.FieldByName(column).Index(j).String() + "\n"
+		}
+		element = dataSlice
+
+	case reflect.String:
+		element = item.FieldByName(column).String()
+	default:
+		fmt.Println(item.FieldByName(column).Type().Kind())
+	}
+
+	return element
 }
