@@ -63,7 +63,7 @@ func init() {
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Hash, "hash", "H", "", "Hash or file containing the hashes")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Target, "target", "t", "", "Host pointing to the LDAP server")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Domain, "domain", "d", "", "Domain for the authentication (by default the domain name will be guessed with a smb connection)")
-	dumpCmd.Flags().IntVar(&ldapOptions.Timeout, "timeout", int(ldaplib.DefaultTimeout.Seconds()), "Timeout for the LDAP connection in seconds")
+	LdapCmd.PersistentFlags().IntVar(&ldapOptions.Timeout, "timeout", int(ldaplib.DefaultTimeout.Seconds()), "Timeout for the LDAP connection in seconds")
 
 	LdapCmd.MarkFlagRequired("target")
 	LdapCmd.MarkFlagRequired("user")
