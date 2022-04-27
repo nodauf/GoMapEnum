@@ -43,7 +43,7 @@ func init() {
 	SMTPCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
 	SMTPCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
 	SMTPCmd.PersistentFlags().IntVar(&smtpOptions.Timeout, "timeout", 2, "Timeout for the SMTP connection in seconds")
-	SMTPCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Proxy to use (ex: http://localhost:8080)")
+	SMTPCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Socks5 proxy to use (ex: localhost:8080)")
 
 	SMTPCmd.AddCommand(enumCmd)
 }

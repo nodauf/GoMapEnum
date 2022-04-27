@@ -4,9 +4,12 @@ import (
 	"GoMapEnum/src/logger"
 	"GoMapEnum/src/modules/smb"
 	"fmt"
+	"net"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/net/proxy"
 )
 
 var level logger.Level
@@ -39,6 +42,7 @@ func init() {
 	SmbCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
 	SmbCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
 	SmbCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
+	SmbCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Socks5 proxy to use (ex: localhost:8080)")
 
 	SmbCmd.AddCommand(bruteCmd)
 }
@@ -56,6 +60,12 @@ func initLogger() {
 
 func initProxy() {
 	if proxyString != "" {
-
+		var err error
+		defaultDailer := &net.Dialer{Timeout: time.Duration(smbOptions.Timeout * int(time.Second))}
+		smbOptions.ProxyTCP, err = proxy.SOCKS5("tcp", proxyString, nil, defaultDailer)
+		if err != nil {
+			fmt.Println("fail to use the proxy " + proxyString + ": " + err.Error())
+			os.Exit(1)
+		}
 	}
 }
