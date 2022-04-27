@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"time"
 
 	"golang.org/x/text/encoding/unicode"
@@ -13,7 +14,31 @@ import (
 	"golang.org/x/net/proxy"
 )
 
-var PASSWORD = "i3siLdA1se!"
+const PASSWORD = "\"i3siLdA1se!\""
+const (
+	UAC_SCRIPT                         = 0x0001
+	UAC_ACCOUNTDISABLE                 = 0x0002
+	UAC_HOMEDIR_REQUIRED               = 0x0008
+	UAC_LOCKOUT                        = 0x0010
+	UAC_PASSWD_NOTREQD                 = 0x0020
+	UAC_PASSWD_CANT_CHANGE             = 0x0040
+	UAC_ENCRYPTED_TEXT_PWD_ALLOWED     = 0x0080
+	UAC_TEMP_DUPLICATE_ACCOUNT         = 0x0100
+	UAC_NORMAL_ACCOUNT                 = 0x0200
+	UAC_INTERDOMAIN_TRUST_ACCOUNT      = 0x0800
+	UAC_WORKSTATION_TRUST_ACCOUNT      = 0x1000
+	UAC_SERVER_TRUST_ACCOUNT           = 0x2000
+	UAC_DONT_EXPIRE_PASSWORD           = 0x10000
+	UAC_MNS_LOGON_ACCOUNT              = 0x20000
+	UAC_SMARTCARD_REQUIRED             = 0x40000
+	UAC_TRUSTED_FOR_DELEGATION         = 0x80000
+	UAC_NOT_DELEGATED                  = 0x100000
+	UAC_USE_DES_KEY_ONLY               = 0x200000
+	UAC_DONT_REQ_PREAUTH               = 0x400000
+	UAC_PASSWORD_EXPIRED               = 0x800000
+	UAC_TRUSTED_TO_AUTH_FOR_DELEGATION = 0x1000000
+	UAC_PARTIAL_SECRETS_ACCOUNT        = 0x04000000
+)
 
 func main() {
 	var wait string
@@ -25,27 +50,92 @@ func main() {
 	baseDN, _ := getDefaultNamingContext(ldapConn)
 
 	createUser("gomapenumUser1", baseDN, ldapConn)
+	createUserEmptyPassword("gomapenumUser2", baseDN, ldapConn)
+	createUserWithoutPreAuth("gomapenumUser3", baseDN, ldapConn)
+	createDisabledUser("gomapenumUser4", baseDN, ldapConn)
 
-	fmt.Println("Enter to contiue ...")
+	fmt.Println("Enter to delete these entries ...")
 
 	fmt.Scanf("%s", &wait)
 
 	// Delete the user
-	fmt.Println("Delete the entry")
-	del := ldap.NewDelRequest("CN=gomapenumUser1,CN=Users,"+baseDN, nil)
-	err = ldapConn.Del(del)
+	fmt.Println("Delete the entries")
+	deleteUser("gomapenumUser1", baseDN, ldapConn)
+	deleteUser("gomapenumUser2", baseDN, ldapConn)
+	deleteUser("gomapenumUser3", baseDN, ldapConn)
+	deleteUser("gomapenumUser4", baseDN, ldapConn)
+
+}
+
+func deleteUser(username, baseDN string, ldapConn *ldap.Conn) {
+	del := ldap.NewDelRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	err := ldapConn.Del(del)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-func createUser(username, baseDN string, ldapConn *ldap.Conn) {
+func createUserEmptyPassword(username, baseDN string, ldapConn *ldap.Conn) {
 	// Create the user
-	add := ldap.NewAddRequest("CN=gomapenumUser1,CN=Users,"+baseDN, nil)
+	uac := strconv.Itoa(UAC_NORMAL_ACCOUNT | UAC_PASSWD_NOTREQD)
+	add := ldap.NewAddRequest("CN="+username+",CN=Users,"+baseDN, nil)
 	add.Attribute("description", []string{"GoMapEnum test"})
-	add.Attribute("sAMAccountName", []string{"gomapenumUser1"})
-	add.Attribute("userAccountControl", []string{"544"})
-	//add.Attribute("memberOf", []string{"CN=Users,CN=Builtin," + baseDN})
+	add.Attribute("sAMAccountName", []string{username})
+	add.Attribute("userAccountControl", []string{uac})
+	add.Attribute("objectClass", []string{"top", "person", "organizationalPerson", "user"})
+
+	err := ldapConn.Add(add)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Reset the password
+	utf16 := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	// According to the MS docs in the links above
+	// The password needs to be enclosed in quotes
+	pwdEncoded, _ := utf16.NewEncoder().String("\"\"")
+	passReq := ldap.NewModifyRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	passReq.Replace("unicodePwd", []string{pwdEncoded})
+	err = ldapConn.Modify(passReq)
+
+	if err != nil {
+		fmt.Printf("Password could not be changed: %s\n", err.Error())
+	}
+}
+
+func createDisabledUser(username, baseDN string, ldapConn *ldap.Conn) {
+	// Create the user
+	uac := strconv.Itoa(UAC_NORMAL_ACCOUNT | UAC_PASSWD_NOTREQD | UAC_ACCOUNTDISABLE)
+	add := ldap.NewAddRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	add.Attribute("description", []string{"GoMapEnum test"})
+	add.Attribute("sAMAccountName", []string{username})
+	add.Attribute("userAccountControl", []string{uac})
+	add.Attribute("objectClass", []string{"top", "person", "organizationalPerson", "user"})
+
+	err := ldapConn.Add(add)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Reset the password
+	utf16 := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	// According to the MS docs in the links above
+	// The password needs to be enclosed in quotes
+	pwdEncoded, _ := utf16.NewEncoder().String(PASSWORD)
+	passReq := ldap.NewModifyRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	passReq.Replace("unicodePwd", []string{pwdEncoded})
+	err = ldapConn.Modify(passReq)
+
+	if err != nil {
+		fmt.Printf("Password could not be changed: %s\n", err.Error())
+	}
+}
+
+func createUserWithoutPreAuth(username, baseDN string, ldapConn *ldap.Conn) {
+	// Create the user
+	uac := strconv.Itoa(UAC_DONT_REQ_PREAUTH | UAC_NORMAL_ACCOUNT | UAC_PASSWD_NOTREQD)
+	add := ldap.NewAddRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	add.Attribute("description", []string{"GoMapEnum test"})
+	add.Attribute("sAMAccountName", []string{username})
+	add.Attribute("userAccountControl", []string{uac})
 	add.Attribute("objectClass", []string{"top", "person", "organizationalPerson", "user"})
 
 	err := ldapConn.Add(add)
@@ -57,8 +147,36 @@ func createUser(username, baseDN string, ldapConn *ldap.Conn) {
 	utf16 := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
 	// According to the MS docs in the links above
 	// The password needs to be enclosed in quotes
-	pwdEncoded, _ := utf16.NewEncoder().String("\"Oooooo12!\"")
-	passReq := ldap.NewModifyRequest("CN=gomapenumUser1,CN=Users,"+baseDN, nil)
+	pwdEncoded, _ := utf16.NewEncoder().String(PASSWORD)
+	passReq := ldap.NewModifyRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	passReq.Replace("unicodePwd", []string{pwdEncoded})
+	err = ldapConn.Modify(passReq)
+
+	if err != nil {
+		fmt.Printf("Password could not be changed: %s\n", err.Error())
+	}
+}
+
+func createUser(username, baseDN string, ldapConn *ldap.Conn) {
+	// Create the user
+	uac := strconv.Itoa(UAC_NORMAL_ACCOUNT | UAC_PASSWD_NOTREQD)
+	add := ldap.NewAddRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	add.Attribute("description", []string{"GoMapEnum test"})
+	add.Attribute("sAMAccountName", []string{username})
+	add.Attribute("userAccountControl", []string{uac})
+	add.Attribute("objectClass", []string{"top", "person", "organizationalPerson", "user"})
+
+	err := ldapConn.Add(add)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Reset the password
+	utf16 := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	// According to the MS docs in the links above
+	// The password needs to be enclosed in quotes
+	pwdEncoded, _ := utf16.NewEncoder().String(PASSWORD)
+	passReq := ldap.NewModifyRequest("CN="+username+",CN=Users,"+baseDN, nil)
 	passReq.Replace("unicodePwd", []string{pwdEncoded})
 	err = ldapConn.Modify(passReq)
 

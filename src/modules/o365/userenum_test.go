@@ -15,7 +15,7 @@ func TestUserEnum(t *testing.T) {
 	var modes = []string{"office", "oauth2"} // Onedrive not ready yet
 
 	options := Options{}
-	log := logger.New("User enumeration", "o365", "https://autologon.microsoftazuread-sso.com")
+	log := logger.New("User enumeration", "o365", "https://login.microsoftonline.com")
 	log.SetLevel(logger.FatalLevel)
 	options.Log = log
 	optionsInterface := reflect.ValueOf(&options).Interface()
