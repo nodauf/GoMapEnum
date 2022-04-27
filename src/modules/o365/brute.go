@@ -5,9 +5,9 @@ import (
 	"GoMapEnum/src/utils"
 	"errors"
 	"reflect"
-	"strconv"
 )
 
+// PrepareOptions is called before checking if the users are valid. It update the logging options to avoid printing the success
 func PrepareOptions(optionsInterface *interface{}) interface{} {
 	options := (*optionsInterface).(*Options)
 
@@ -18,7 +18,7 @@ func PrepareOptions(optionsInterface *interface{}) interface{} {
 	optionsEnum.Mode = "office"
 	optionsEnum.Log = &tmpLogger
 	*optionsEnum.Log = *options.Log
-	optionsEnum.Log.Type = "Enumeration"
+	optionsEnum.Log.Mode = "Enumeration"
 	// If debug or verbose use this level in userenum module otherwise do not show the valid user
 
 	if options.Log.Level == logger.DebugLevel || options.Log.Level == logger.VerboseLevel {
@@ -38,12 +38,7 @@ func Authenticate(optionsInterface *interface{}, email, password string) bool {
 	case "oauth2":
 		valid, err = options.bruteOauth2(email, password)
 		if err != nil && errors.Is(utils.ErrLockout, err) {
-			options.Log.Error("The account %s is locked", email)
-			options.lockoutCounter++
-		}
-		// Fail safe to avoid locking to many account
-		if options.lockoutCounter >= options.LockoutThreshold {
-			options.Log.Fatal("Too many lockout: " + strconv.Itoa(options.lockoutCounter) + " >= " + strconv.Itoa(options.LockoutThreshold))
+			options.Log.Fatal("The account %s is locked", email)
 		}
 
 	case "autodiscover":

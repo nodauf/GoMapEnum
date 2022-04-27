@@ -54,7 +54,7 @@ func init() {
 	bruteCmd.Flags().StringVarP(&smbOptions.Domain, "domain", "d", "", "Domain for the authentication (by default the domain name will be guessed)")
 	bruteCmd.Flags().IntVar(&smbOptions.Thread, "thread", 2, "Number of threads")
 	bruteCmd.Flags().IntVar(&smbOptions.Timeout, "timeout", 5, "Timeout for the SMB connection in seconds")
-	bruteCmd.Flags().IntVarP(&smbOptions.LockoutThreshold, "lockout-threshold", "l", 1, "Stop the bruteforce when the threshold is meet")
+	bruteCmd.Flags().BoolVar(&smbOptions.StopOnLockout, "stopOnLockout", true, "Stop the bruteforce if an account is locked out")
 	bruteCmd.Flags().IntVarP(&smbOptions.Sleep, "sleep", "s", 0, "Sleep in seconds before sending an authentication request")
 	bruteCmd.MarkFlagRequired("user")
 	bruteCmd.MarkFlagRequired("target")

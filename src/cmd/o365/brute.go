@@ -50,7 +50,7 @@ func init() {
 	bruteCmd.Flags().StringVarP(&o365Options.Users, "user", "u", "", "User or file containing the emails")
 	bruteCmd.Flags().StringVarP(&o365Options.Passwords, "password", "p", "", "Password or file containing the passwords")
 	bruteCmd.Flags().IntVarP(&o365Options.Sleep, "sleep", "s", 0, "Sleep in seconds before sending an authentication request")
-	bruteCmd.Flags().IntVarP(&o365Options.LockoutThreshold, "lockout-threshold", "l", 1, "Stop the bruteforce when the threshold is meet")
+	bruteCmd.Flags().BoolVar(&o365Options.StopOnLockout, "stopOnLockout", true, "Stop the bruteforce if an account is locked out")
 	bruteCmd.Flags().IntVar(&o365Options.Thread, "thread", 2, "Number of threads ")
 	bruteCmd.MarkFlagRequired("user")
 	bruteCmd.MarkFlagRequired("password")
