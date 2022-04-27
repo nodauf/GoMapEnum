@@ -3,6 +3,7 @@ package cmd
 import (
 	"GoMapEnum/src/cmd/adfs"
 	"GoMapEnum/src/cmd/azure"
+	"GoMapEnum/src/cmd/kerberos"
 	"GoMapEnum/src/cmd/ldap"
 	"GoMapEnum/src/cmd/linkedin"
 	"GoMapEnum/src/cmd/o365"
@@ -42,6 +43,7 @@ func init() {
 	rootCmd.AddCommand(adfs.AdfsCmd)
 	rootCmd.AddCommand(ldap.LdapCmd)
 	rootCmd.AddCommand(linkedin.LinkedinCmd)
+	rootCmd.AddCommand(kerberos.KerberosCmd)
 	rootCmd.AddCommand(o365.O365Cmd)
 	rootCmd.AddCommand(owa.OwaCmd)
 	rootCmd.AddCommand(searchEngine.SearchEngineCmd)
