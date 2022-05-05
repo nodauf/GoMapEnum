@@ -12,8 +12,6 @@ type Options struct {
 	Hostname string
 	utils.BaseOptions
 	IsHash bool
-
-	lockoutCounter int
 }
 
 func (options *Options) GetBaseOptions() *utils.BaseOptions {

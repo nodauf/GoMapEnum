@@ -17,9 +17,9 @@ var bruteCmd = &cobra.Command{
 	Credits: https://github.com/cytopia/smtp-user-enum`,
 	Example: `go run main.go smb brute -u users  -t mail.contoso.com -d domain.tld -o validUsers`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if smbOptions.Passwords == "" && smbOptions.Hash == "" {
-			return errors.New("The field password or hash is required")
-		} else if smbOptions.Passwords != "" && smbOptions.Hash != "" {
+		//if smbOptions.Passwords == "" && smbOptions.Hash == "" {
+		//	return errors.New("The field password or hash is required")
+		if smbOptions.Passwords != "" && smbOptions.Hash != "" {
 			return errors.New("Only password or hash field should be specified")
 		}
 
