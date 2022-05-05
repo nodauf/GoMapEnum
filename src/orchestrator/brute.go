@@ -27,7 +27,11 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 			optionsEnum := orchestrator.CustomOptionsForCheckIfValid(&optionsInterface)
 			usernameList = strings.Split(orchestrator.UserEnum(optionsEnum.(Options)), "\n")
 		} else {
+			// Switch the mode to enumeration by default
+			previousMode := optionsInterface.(Options).GetBaseOptions().Log.Mode
+			optionsInterface.(Options).GetBaseOptions().Log.Mode = "Enumeration"
 			usernameList = strings.Split(orchestrator.UserEnum(optionsModules), "\n")
+			optionsInterface.(Options).GetBaseOptions().Log.Mode = previousMode
 		}
 	} else {
 		options.Users = utils.GetStringOrFile(options.Users)
@@ -87,7 +91,8 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 		email = strings.Trim(email, "\r")
 		email = strings.Trim(email, "\n")
 		if email != "" {
-		queue <- email
+			queue <- email
+		}
 	}
 
 	close(queue)
