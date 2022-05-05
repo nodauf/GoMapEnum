@@ -12,20 +12,20 @@ import (
 
 // BaseOptions is the common options for the module
 type BaseOptions struct {
-	Users            string
-	UsernameList     []string
-	Passwords        string
-	Thread           int
-	Log              *logger.Logger
-	NoBruteforce     bool
-	LockoutThreshold int
-	Sleep            int
-	Target           string
-	CheckIfValid     bool
-	Company          string
-	ProxyHTTP        func(*http.Request) (*url.URL, error)
-	ProxyTCP         proxy.Dialer
-	Mutex            sync.Mutex
+	Users         string
+	UsernameList  []string
+	Passwords     string
+	Thread        int
+	Log           *logger.Logger
+	NoBruteforce  bool
+	StopOnLockout bool
+	Sleep         int
+	Target        string
+	CheckIfValid  bool
+	Company       string
+	ProxyHTTP     func(*http.Request) (*url.URL, error)
+	ProxyTCP      proxy.Dialer
+	Mutex         sync.Mutex
 }
 
 // ErrLockout is the error to returned when an account is locked
