@@ -86,6 +86,7 @@ func (orchestrator *Orchestrator) Bruteforce(optionsModules Options) string {
 		email = strings.ToValidUTF8(email, "")
 		email = strings.Trim(email, "\r")
 		email = strings.Trim(email, "\n")
+		if email != "" {
 		queue <- email
 	}
 
