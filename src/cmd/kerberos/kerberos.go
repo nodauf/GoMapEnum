@@ -19,7 +19,6 @@ var debug bool
 var outputCmd string
 var output string
 var proxyString string
-var validUsers string
 
 var kerberosOptions kerberos.Options
 
@@ -45,17 +44,17 @@ func init() {
 	KerberosCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
 	KerberosCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
 	KerberosCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Socks5 proxy to use (ex: localhost:8080)")
-	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Users, "user", "u", "", "User or file containing the emails")
-	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Passwords, "password", "p", "", "Password or file containing the passwords")
-	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Hash, "hash", "H", "", "Hash or file containing the hashes")
-	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.DomainController, "target", "t", "", "Host pointing to the kerberos server")
-	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Domain, "domain", "d", "", "Domain for the authentication (by default the domain name will be guessed with a smb connection)")
+	//KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Users, "user", "u", "", "User or file containing the emails")
+	//KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Passwords, "password", "p", "", "Password or file containing the passwords")
+	//KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Hash, "hash", "H", "", "Hash or file containing the hashes")
+	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Target, "target", "t", "", "Host pointing to the kerberos server")
+	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Domain, "domain", "d", "", "Domain for the authentication in netbios format (by default the domain name will be guessed with a ldap connection)")
 	KerberosCmd.PersistentFlags().IntVar(&kerberosOptions.Timeout, "timeout", int(ldaplib.DefaultTimeout.Seconds()), "Timeout for the kerberos connection in seconds")
-
-	KerberosCmd.MarkFlagRequired("target")
-	KerberosCmd.MarkFlagRequired("user")
+	KerberosCmd.PersistentFlags().IntVar(&kerberosOptions.Thread, "thread", 2, "Number of threads")
 
 	KerberosCmd.AddCommand(enumCmd)
+	KerberosCmd.AddCommand(bruteCmd)
+	KerberosCmd.AddCommand(kerberoastingCmd)
 }
 
 func initLogger() {
