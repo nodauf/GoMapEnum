@@ -2,9 +2,7 @@ package smtp
 
 import (
 	"GoMapEnum/src/utils"
-	"fmt"
 	"net"
-	"time"
 
 	smtp "github.com/nodauf/net-smtp"
 )
@@ -25,15 +23,10 @@ func (options *Options) prepareOneConnection(client *smtp.Client) error {
 func (options *Options) createNewConnection() *smtp.Client {
 	var conn net.Conn
 	var err error
-	if options.ProxyTCP != nil {
-		conn, err = options.ProxyTCP.Dial("tcp", fmt.Sprintf("%s:%d", options.Target, 25))
-	} else {
-		defaultDailer := &net.Dialer{Timeout: time.Duration(options.Timeout * int(time.Second))}
-		conn, err = defaultDailer.Dial("tcp", fmt.Sprintf("%s:%d", options.Target, 25))
-	}
 
+	conn, err = utils.OpenConnectionWoProxy(options.Target, "25", options.Timeout, options.ProxyTCP)
 	if err != nil {
-		options.Log.Error("Failed to establish a connection " + err.Error())
+		options.Log.Error("cannot open a connection to %s:%d : %v", options.Target, 25, err)
 		return nil
 	}
 

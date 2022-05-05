@@ -1,19 +1,26 @@
 package utils
 
 import (
+	templateResources "GoMapEnum/src/template"
 	"bytes"
+	"crypto/hmac"
+	"crypto/md5"
+	"crypto/rc4"
 	"crypto/tls"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"math/rand"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"reflect"
 	"regexp"
 	"strings"
+	"text/template"
 	"time"
+
+	"golang.org/x/net/proxy"
 )
 
 func init() {
@@ -213,7 +220,7 @@ func DataToHTML(rows [][]string, columns []string, title string) bytes.Buffer {
 		"replace": func(input, from, to string) string { return strings.Replace(input, from, to, -1) },
 	}
 
-	t, _ := template.New("datatables.tpl").Funcs(customFunctions).ParseFiles("template/datatables.tpl")
+	t, _ := template.New("datatables.tpl").Funcs(customFunctions).Parse(templateResources.GetTemplateDatatables())
 	//t, err := template.ParseFiles("template/datatables.tpl")
 	//f, _ := os.Create("users.html")
 
@@ -232,7 +239,6 @@ func DataToHTML(rows [][]string, columns []string, title string) bytes.Buffer {
 
 func SearchInStruct(item reflect.Value, column string) string {
 	var element string
-
 	switch item.FieldByName(column).Type().Kind() {
 	case reflect.Slice:
 		var dataSlice string
@@ -249,4 +255,43 @@ func SearchInStruct(item reflect.Value, column string) string {
 	}
 
 	return element
+}
+
+func OpenConnectionWoProxy(target, port string, timeout int, proxyTCP proxy.Dialer) (net.Conn, error) {
+	var conn net.Conn
+	var err error
+	if proxyTCP != nil {
+		conn, err = proxyTCP.Dial("tcp", fmt.Sprintf("%s:%s", target, port))
+	} else {
+		defaultDialer := &net.Dialer{Timeout: time.Duration(timeout * int(time.Second))}
+		conn, err = defaultDialer.Dial("tcp", fmt.Sprintf("%s:%s", target, port))
+	}
+
+	if err != nil || conn == nil {
+		var errStr string
+		if err != nil {
+			errStr = err.Error()
+		} else {
+			errStr = "No error but connection is nil"
+		}
+		return conn, fmt.Errorf(errStr)
+	}
+	return conn, nil
+}
+
+func GetHmacMd5(data []byte, key []byte) []byte {
+	mac := hmac.New(md5.New, key)
+	mac.Write(data)
+	return mac.Sum(nil)
+}
+func RC4Decrypt(encData []byte, key []byte) ([]byte, error) {
+	dst := make([]byte, len(encData))
+	rc4cipher, err := rc4.NewCipher(key)
+
+	if err != nil {
+		return nil, err
+	}
+
+	rc4cipher.XORKeyStream(dst, encData)
+	return dst, nil
 }
