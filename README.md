@@ -3,6 +3,8 @@
 
 Nothing new but existing techniques are brought together in one tool.
 
+*The screenshot below are not up-to-date and the command line have changed*
+
 ## Description
 
 ### Summary
@@ -80,9 +82,11 @@ SMTP servers can be vulnerable to a user enumeration weakness. Three differents 
 
 ![User enumeration on SMTP](./images/smtp-UserEnum.png)
 
-## TODO
-- [ ] Support Kerberos protocol
-- [ ] Support SMB protocol
+### LDAP
+
+### Kerberos
+
+### SMB
 
 ## Credits
 https://github.com/busterb/msmailprobe
