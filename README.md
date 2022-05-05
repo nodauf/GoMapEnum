@@ -89,8 +89,15 @@ SMTP servers can be vulnerable to a user enumeration weakness. Three differents 
 ### SMB
 
 ## Credits
-https://github.com/busterb/msmailprobe
-https://github.com/0xZDH/o365spray/
-https://github.com/xFreed0m/ADFSpray/
-https://github.com/m8r0wn/CrossLinked
-https://github.com/cytopia/smtp-user-enum
+- https://github.com/busterb/msmailprobe
+- https://github.com/0xZDH/o365spray/
+- https://github.com/xFreed0m/ADFSpray/
+- https://github.com/m8r0wn/CrossLinked
+- https://github.com/cytopia/smtp-user-enum
+- https://github.com/ropnop/kerbrute
+- https://github.com/leechristensen/tgscrack
+- https://github.com/ropnop/go-windapsearch
+- https://github.com/go-ldap/ldap
+- https://github.com/hirochachacha/go-smb2
+- https://github.com/jcmturner/gokrb5
+- ... and a lot more
