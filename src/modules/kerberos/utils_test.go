@@ -2,8 +2,10 @@ package kerberos
 
 import (
 	"GoMapEnum/src/logger"
+	"GoMapEnum/src/utils"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/nodauf/gokrb5/v8/iana/errorcode"
@@ -21,7 +23,6 @@ func TestTestUsername(t *testing.T) {
 	options := Options{}
 	options.Target = "192.168.1.60"
 	options.Domain = "pentest.lab"
-	options.DomainController = "192.168.1.60"
 	log := logger.New("UserEnumeration", "Kerberos", options.Target)
 	log.SetLevel(logger.FatalLevel)
 	options.Log = log
@@ -30,9 +31,9 @@ func TestTestUsername(t *testing.T) {
 	KerberosSession(&optionsInterface)
 
 	for username, wantedResults := range results {
-		ok, err := options.TestUsername(username)
+		ok, err := options.testUsername(username)
 		if (err == nil && wantedResults != "") || (err != nil && err.Error() != wantedResults) {
-			t.Errorf("Authentication for %s returned %t with error %v and was expected %v", username, ok, err, wantedResults)
+			t.Errorf("A guess for %s returned %t with error %v and was expected %v", username, ok, err, wantedResults)
 		}
 	}
 }
@@ -48,5 +49,71 @@ func TestASRepToHascat(t *testing.T) {
 	}
 	if hash != wantedResults {
 		t.Errorf("ASRep message decoded to %s and was expected %s", hash, wantedResults)
+	}
+}
+
+func TestKerberoasting(t *testing.T) {
+	var results = make(map[string]string)
+	results["gomapenumUser4-SPNNotFound/random.xx.lan"] = ""
+	results["gomapenumUser5-whatever/random.xx.lan"] = "i3siLdA1se!"
+
+	options := Options{}
+	options.Target = "192.168.1.60"
+	options.Domain = "pentest.lab"
+	log := logger.New("UserEnumeration", "Kerberos", options.Target)
+	log.SetLevel(logger.FatalLevel)
+	options.Log = log
+	optionsInterface := reflect.ValueOf(&options).Interface()
+
+	KerberosSession(&optionsInterface)
+	cl, _ := options.authenticate("vagrant", "vagrant")
+	for usernameWithSPN, wantedResults := range results {
+		username := strings.Split(usernameWithSPN, "-")[0]
+		spn := strings.Split(usernameWithSPN, "-")[1]
+		tgs := kerberoasting(cl, username, spn)
+		if (tgs == "") && wantedResults != "" {
+			t.Errorf("A TGS was expected for %s for spn %s and got %s", username, spn, tgs)
+		} else if (tgs != "") && wantedResults == "" {
+			t.Errorf("A TGS was not expected for %s for spn %s and got %s", username, spn, tgs)
+		}
+		if tgs != "" {
+			ok, _ := decryptTGS(strings.Split(tgs, "$")[7], strings.Split(tgs, "$")[6], wantedResults)
+			if !ok {
+				t.Errorf("Failed to decrypt TGS with key %s", wantedResults)
+			}
+			randomKey := utils.RandomString(10)
+			ok, _ = decryptTGS(strings.Split(tgs, "$")[7], strings.Split(tgs, "$")[6], randomKey)
+			if ok {
+				t.Errorf("Decryption was successful with the random key %s", randomKey)
+			}
+		}
+	}
+}
+
+func TestBruteforce(t *testing.T) {
+	var results = make(map[string]string)
+	results["gomapenumUser1/i3siLdA1se!"] = ""
+	results["gomapenumUser2/"] = "client has neither a keytab nor a password set and no session"
+	results["gomapenumUser3/i3siLdA1se!"] = ""
+	results["gomapenumUser4/i3siLdA1se!"] = "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_CLIENT_REVOKED)
+	results["gomapenumUser1/wrongPassword"] = "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_PREAUTH_FAILED)
+	results["wrongUser/wrongPassword"] = "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_C_PRINCIPAL_UNKNOWN)
+
+	options := Options{}
+	options.Target = "192.168.1.60"
+	options.Domain = "pentest.lab"
+	log := logger.New("UserEnumeration", "Kerberos", options.Target)
+	log.SetLevel(logger.FatalLevel)
+	options.Log = log
+	optionsInterface := reflect.ValueOf(&options).Interface()
+
+	KerberosSession(&optionsInterface)
+	for usernameWithPassword, wantedResults := range results {
+		username := strings.Split(usernameWithPassword, "/")[0]
+		password := strings.Split(usernameWithPassword, "/")[1]
+		_, err := options.authenticate(username, password)
+		if (err == nil && wantedResults != "") || (err != nil && err.Error() != wantedResults) {
+			t.Errorf("Authentication for %s returned the error %v and was expected %v", username, err, wantedResults)
+		}
 	}
 }
