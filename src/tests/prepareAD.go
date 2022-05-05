@@ -1,12 +1,12 @@
 package main
 
 import (
+	"GoMapEnum/src/utils"
 	"crypto/tls"
 	"fmt"
 	"log"
-	"net"
 	"strconv"
-	"time"
+	"strings"
 
 	"golang.org/x/text/encoding/unicode"
 
@@ -44,6 +44,7 @@ func main() {
 	var wait string
 	// Bind a LDAP connection
 	ldapConn, err := authenticateNTLM("192.168.1.60", "pentest.lab", "vagrant", "vagrant", false)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,6 +54,7 @@ func main() {
 	createUserEmptyPassword("gomapenumUser2", baseDN, ldapConn)
 	createUserWithoutPreAuth("gomapenumUser3", baseDN, ldapConn)
 	createDisabledUser("gomapenumUser4", baseDN, ldapConn)
+	createUserWithSPN("gomapenumUser5", baseDN, ldapConn)
 
 	fmt.Println("Enter to delete these entries ...")
 
@@ -64,6 +66,7 @@ func main() {
 	deleteUser("gomapenumUser2", baseDN, ldapConn)
 	deleteUser("gomapenumUser3", baseDN, ldapConn)
 	deleteUser("gomapenumUser4", baseDN, ldapConn)
+	deleteUser("gomapenumUser5", baseDN, ldapConn)
 
 }
 
@@ -185,9 +188,38 @@ func createUser(username, baseDN string, ldapConn *ldap.Conn) {
 	}
 }
 
+func createUserWithSPN(username, baseDN string, ldapConn *ldap.Conn) {
+	// Create the user
+	uac := strconv.Itoa(UAC_NORMAL_ACCOUNT | UAC_PASSWD_NOTREQD)
+	add := ldap.NewAddRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	add.Attribute("description", []string{"GoMapEnum test"})
+	add.Attribute("sAMAccountName", []string{username})
+	add.Attribute("userAccountControl", []string{uac})
+	add.Attribute("servicePrincipalName", []string{"whatever/random.xx.lan"})
+	add.Attribute("objectClass", []string{"top", "person", "organizationalPerson", "user"})
+
+	err := ldapConn.Add(add)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Reset the password
+	utf16 := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	// According to the MS docs in the links above
+	// The password needs to be enclosed in quotes
+	pwdEncoded, _ := utf16.NewEncoder().String(PASSWORD)
+	passReq := ldap.NewModifyRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	passReq.Replace("unicodePwd", []string{pwdEncoded})
+	err = ldapConn.Modify(passReq)
+
+	if err != nil {
+		fmt.Printf("Password could not be changed: %s\n", err.Error())
+	}
+}
+
 func authenticateNTLM(target, domain, username, password string, isHash bool) (*ldap.Conn, error) {
 
-	ldapConn, err := establisheConnection(target, true, 5, nil)
+	ldapConn, err := establisheConnection(target, "starttls", 5, nil)
 	if err != nil || ldapConn == nil {
 		return nil, fmt.Errorf("fail to establish a connection to the target %s: %w", target, err)
 	}
@@ -199,21 +231,19 @@ func authenticateNTLM(target, domain, username, password string, isHash bool) (*
 	}
 	return ldapConn, err
 }
-func establisheConnection(target string, TLS bool, timeout int, proxyTCP proxy.Dialer) (*ldap.Conn, error) {
-	var conn net.Conn
-	var err error
+func establisheConnection(target string, TLSMode string, timeout int, proxyTCP proxy.Dialer) (*ldap.Conn, error) {
+
 	var port string
-	if TLS {
+	switch strings.ToLower(TLSMode) {
+	case "tls":
 		port = ldap.DefaultLdapsPort
-	} else {
+	case "starttls", "notls":
 		port = ldap.DefaultLdapPort
+	default:
+		return nil, fmt.Errorf("invalid TLSMode %s", TLSMode)
 	}
-	if proxyTCP != nil {
-		conn, err = proxyTCP.Dial("tcp", fmt.Sprintf("%s:%s", target, port))
-	} else {
-		defaultDialer := &net.Dialer{Timeout: time.Duration(timeout * int(time.Second))}
-		conn, err = defaultDialer.Dial("tcp", fmt.Sprintf("%s:%s", target, port))
-	}
+	conn, err := utils.OpenConnectionWoProxy(target, port, timeout, proxyTCP)
+
 	fmt.Printf("connect to %s:%s\n", target, port)
 	// Check if connection is successful
 	if err != nil {
@@ -221,15 +251,24 @@ func establisheConnection(target string, TLS bool, timeout int, proxyTCP proxy.D
 	}
 
 	var ldapConnection *ldap.Conn
-	if TLS {
+	switch strings.ToLower(TLSMode) {
+	case "tls":
 		tlsConn := tls.Client(conn, &tls.Config{InsecureSkipVerify: true})
-		ldapConnection = ldap.NewConn(tlsConn, TLS)
-	} else {
-		ldapConnection = ldap.NewConn(conn, TLS)
-	}
-	ldapConnection.Start()
+		ldapConnection = ldap.NewConn(tlsConn, true)
+		ldapConnection.Start()
+	case "starttls":
+		ldapConnection = ldap.NewConn(conn, false)
+		ldapConnection.Start()
+		err = ldapConnection.StartTLS(&tls.Config{InsecureSkipVerify: true})
 
-	return ldapConnection, nil
+	case "notls":
+		ldapConnection = ldap.NewConn(conn, false)
+		ldapConnection.Start()
+	default:
+		return nil, fmt.Errorf("invalid TLSMode %s", TLSMode)
+	}
+	return ldapConnection, err
+
 }
 func getDefaultNamingContext(ldapConn *ldap.Conn) (string, error) {
 
