@@ -37,7 +37,7 @@ func Authenticate(optionsInterface *interface{}, email, password string) bool {
 	switch options.Mode {
 	case "oauth2":
 		valid, err = options.bruteOauth2(email, password)
-		if err != nil && errors.Is(utils.ErrLockout, err) {
+		if err != nil && errors.Is(utils.ErrLockout, err) && options.StopOnLockout {
 			options.Log.Fatal("The account %s is locked", email)
 		}
 
