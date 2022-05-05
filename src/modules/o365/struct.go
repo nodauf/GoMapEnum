@@ -7,14 +7,12 @@ import (
 
 // Options for o365 module
 type Options struct {
-	Mode             string
-	DumpObjects      string
-	HTML             bool
-	JSON             bool
-	LockoutThreshold int
+	Mode        string
+	DumpObjects string
+	HTML        bool
+	JSON        bool
 
-	lockoutCounter int
-	validTenants   map[string]bool
+	validTenants map[string]bool
 	utils.BaseOptions
 }
 
