@@ -19,7 +19,7 @@ var enumCmd = &cobra.Command{
 	Example: `go run main.go azure userenum -u john.doe@contoso.com
 	go run main.go userenum azure -u users -o validUsers`,
 	Run: func(cmdCli *cobra.Command, args []string) {
-		log := logger.New("Enumeration", "o365", "https://autologon.microsoftazuread-sso.com")
+		log := logger.New("Enumeration", "o365", "https://login.microsoftonline.com")
 		log.SetLevel(level)
 		log.Info("Starting the module Azure")
 		o365Options.Log = log
