@@ -13,11 +13,14 @@ type Options struct {
 	Domain   string
 	Hostname string
 	BaseDN   string
-	TLS      bool
+	TLS      string
 	utils.BaseOptions
-	DumpObjects string
+	DumpObjects []string
+	UseNTLM     bool
+	HTML        bool
+	JSON        bool
+	IsHash      bool
 
-	IsHash   bool
 	ldapConn *ldap.Conn
 	queries  map[string]map[string]string
 }

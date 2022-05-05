@@ -8,24 +8,44 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-func TestEstablisheConnectionLDAP(t *testing.T) {
-	ldapConn, err := establisheConnection("192.168.1.60", false, 5, nil)
+func TestEstablisheConnectionLDAPNoTLS(t *testing.T) {
+	ldapConnNoTLS, err := establisheConnection("192.168.1.60", "NoTLS", 5, nil)
 	if err != nil {
-		t.Errorf("establisheConnection return the error: %s", err.Error())
+		t.Errorf("establisheConnection for NoTLS mode return the error: %s", err.Error())
 	}
-	if ldapConn == nil {
-		t.Error("ldapConn is nil")
+	if ldapConnNoTLS == nil {
+		t.Error("ldapConnNoTLS is nil")
 	}
+	ldapConnNoTLS.Close()
+
+	ldapConnStartTLS, err := establisheConnection("192.168.1.60", "StartTLS", 5, nil)
+	if err != nil {
+		t.Errorf("establisheConnection for StartTLS mode return the error: %s", err.Error())
+	}
+	if ldapConnStartTLS == nil {
+		t.Error("ldapConnStartTLS is nil")
+	}
+
+	ldapConnUnknowTLS, err := establisheConnection("192.168.1.60", "NotSupportedTLSMode", 5, nil)
+	expectedError := "invalid TLSMode NotSupportedTLSMode"
+	if err == nil || err != nil && err.Error() != expectedError {
+		t.Errorf("establisheConnection for NotSupportedTLSMode return the error %v and was expected %s", err, expectedError)
+	}
+	if ldapConnUnknowTLS != nil {
+		t.Error("ldapConnUnknowTLS is not nil")
+	}
+	ldapConnStartTLS.Close()
 }
 
 func TestEstablisheConnectionLDAPS(t *testing.T) {
-	ldapConn, err := establisheConnection("192.168.1.60", true, 5, nil)
+	ldapConn, err := establisheConnection("192.168.1.60", "TLS", 5, nil)
 	if err != nil {
 		t.Errorf("establisheConnection return the error: %s", err.Error())
 	}
 	if ldapConn == nil {
 		t.Error("ldapConn is nil")
 	}
+	ldapConn.Close()
 }
 
 func TestAuthenticateNTLMWithPassword(t *testing.T) {
@@ -37,15 +57,9 @@ func TestAuthenticateNTLMWithPassword(t *testing.T) {
 	results["gomapenumUser1/wrongPassword"] = ldap.LDAPResultInvalidCredentials
 	results["wrongUser/wrongPassword"] = ldap.LDAPResultInvalidCredentials
 
-	ldapConn, err := establisheConnection("192.168.1.60", false, 5, nil)
-	if err != nil {
-		t.Errorf("establisheConnection return the error: %s", err.Error())
-	}
-	if ldapConn == nil {
-		t.Error("ldapConn is nil")
-	}
 	options := Options{}
 	options.Target = "192.168.1.60"
+	options.TLS = "NoTLS"
 	log := logger.New("Bruteforce", "SMB", options.Target)
 	log.SetLevel(logger.FatalLevel)
 	options.Log = log
@@ -54,6 +68,7 @@ func TestAuthenticateNTLMWithPassword(t *testing.T) {
 		username := strings.Split(credential, "/")[0]
 		password := strings.Split(credential, "/")[1]
 		err := options.authenticateNTLM(username, password, false)
+		options.ldapConn.Close()
 		// Test for success
 		if err == nil && wantedResults == 0 {
 			continue
@@ -74,15 +89,9 @@ func TestAuthenticateNTLMWithHash(t *testing.T) {
 	results["gomapenumUser1/bea05617f843e9971f7233c975b2ff"] = ldap.LDAPResultInvalidCredentials
 	results["wrongUser/bea05617f843e9971f7233c975b2ffc1"] = ldap.LDAPResultInvalidCredentials
 
-	ldapConn, err := establisheConnection("192.168.1.60", false, 5, nil)
-	if err != nil {
-		t.Errorf("establisheConnection return the error: %s", err.Error())
-	}
-	if ldapConn == nil {
-		t.Error("ldapConn is nil")
-	}
 	options := Options{}
 	options.Target = "192.168.1.60"
+	options.TLS = "NoTLS"
 	log := logger.New("Bruteforce", "SMB", options.Target)
 	log.SetLevel(logger.FatalLevel)
 	options.Log = log
@@ -91,6 +100,7 @@ func TestAuthenticateNTLMWithHash(t *testing.T) {
 		username := strings.Split(credential, "/")[0]
 		password := strings.Split(credential, "/")[1]
 		err := options.authenticateNTLM(username, password, true)
+		options.ldapConn.Close()
 		// Test for success
 		if err == nil && wantedResults == 0 {
 			continue

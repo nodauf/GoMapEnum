@@ -15,9 +15,9 @@ var dumpCmd = &cobra.Command{
 	Example: `go run main.go ldap dump -t 192.168.1.175 -u user -p securePassword --dump computers,users
 	go run main.go ldap dump -t 192.168.1.175 -u user -p securePassword --dump all`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if ldapOptions.Passwords == "" && ldapOptions.Hash == "" {
-			return errors.New("The field password or hash is required")
-		} else if ldapOptions.Passwords != "" && ldapOptions.Hash != "" {
+		//if ldapOptions.Passwords == "" && ldapOptions.Hash == "" {
+		//	return errors.New("The field password or hash is required")
+		if ldapOptions.Passwords != "" && ldapOptions.Hash != "" {
 			return errors.New("Only password or hash field should be specified")
 		}
 
@@ -42,8 +42,10 @@ var dumpCmd = &cobra.Command{
 
 func init() {
 	dumpCmd.Flags().StringVarP(&ldapOptions.BaseDN, "baseDN", "b", "", "The base DN for all ldap queries. Default it will be the defaultNamingContext")
-	dumpCmd.Flags().StringVar(&ldapOptions.DumpObjects, "dump", "", "Dump objects among computers,users. Could be 'all' keyword  (ex: computers,users)")
+	dumpCmd.Flags().StringSliceVar(&ldapOptions.DumpObjects, "dump", []string{"users"}, "Dump objects among computers,users,kerberoastableAccounts. Could be 'all' keyword  (ex: computers,users)")
 	dumpCmd.Flags().IntVar(&ldapOptions.Thread, "thread", 2, "Number of threads")
 	dumpCmd.Flags().IntVarP(&ldapOptions.Sleep, "sleep", "s", 0, "Sleep in seconds before sending an authentication request")
+	dumpCmd.Flags().BoolVar(&ldapOptions.HTML, "html", false, "save the output as html")
+	dumpCmd.Flags().BoolVar(&ldapOptions.JSON, "json", false, "save the output as JSON (all data are kept)")
 
 }
