@@ -17,8 +17,7 @@ func (options *Options) InitLDAP() bool {
 
 	RetrieveTargetInfo(&optionsInterface)
 	valid, err := options.authenticate(options.Users, options.Passwords)
-
-	if !valid && err != nil {
+	if !valid || err != nil {
 		if ldap.IsErrorWithCode(err, ldap.LDAPResultInvalidCredentials) {
 			options.Log.Error("fail to authenticate: Invalid credential")
 		} else {

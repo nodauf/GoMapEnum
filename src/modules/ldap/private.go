@@ -129,11 +129,7 @@ func (options *Options) authenticate(username, password string) (bool, error) {
 		err = options.authenticateSimple(username, password)
 	}
 	if err != nil {
-		if !strings.Contains(err.Error(), "Invalid Credentials") {
-			options.Log.Error("fail to authenticate: %s", err.Error())
-			return false, err
-		}
-		return false, nil
+		return false, err
 	}
 	return true, err
 }
