@@ -3,6 +3,7 @@ package kerberos
 import (
 	"GoMapEnum/src/logger"
 	"reflect"
+	"strings"
 )
 
 func Authenticate(optionsInterface *interface{}, username, password string) bool {
@@ -11,6 +12,9 @@ func Authenticate(optionsInterface *interface{}, username, password string) bool
 	defer client.Destroy()
 	if err != nil {
 		ok, errorString := handleKerbError(err)
+		if strings.Contains(errorString, "LOCKED OUT") && options.StopOnLockout {
+			options.Log.Fatal("The user %s has been locked out. Abort the bruteforce", username)
+		}
 		if ok {
 			options.Log.Debug("%s - %s", username, errorString)
 		} else {

@@ -44,6 +44,7 @@ func init() {
 	bruteCmd.Flags().BoolVarP(&kerberosOptions.CheckIfValid, "check", "c", true, "Check if the user is valid before trying password")
 	bruteCmd.Flags().StringVarP(&kerberosOptions.Users, "user", "u", "", "User or file containing the usernames")
 	bruteCmd.Flags().StringVarP(&kerberosOptions.Passwords, "password", "p", "", "Password or file containing the passwords")
-	bruteCmd.Flags().StringVarP(&kerberosOptions.Hash, "hash", "H", "", "Hash or file containing the hashes")
+	bruteCmd.Flags().StringVarP(&kerberosOptions.Hash, "hash", "H", "", "Hash or file containing the hashes (not implemented yet)")
+	bruteCmd.Flags().BoolVar(&kerberosOptions.StopOnLockout, "stopOnLockout", true, "Stop the bruteforce if an account is locked out")
 	bruteCmd.MarkFlagRequired("user")
 }
