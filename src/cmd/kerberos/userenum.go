@@ -15,7 +15,6 @@ var enumCmd = &cobra.Command{
 	Use:   "userenum",
 	Short: "Enumerate valid domain usernames via Kerberos",
 	Long: `Will enumerate valid usernames from a list by constructing AS-REQs to requesting a TGT from the KDC.
-	If no domain controller is specified, the tool will attempt to look one up via DNS SRV records.
 	A full domain is required. This domain will be capitalized and used as the Kerberos realm when attempting the bruteforce.
 	Valid usernames will be displayed on stdout.
 	It will not increase the badPwdCount counter.`,
