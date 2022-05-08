@@ -115,7 +115,6 @@ func (options *Options) authenticate(username, password string) (bool, *kclient.
 	if strings.Contains(eString, "Clock skew too great") {
 		// clock skew off, but that means password worked since PRE-AUTH was successful
 		valid = true
-		err = fmt.Errorf("Clock skew is too great")
 	}
 	return valid, client, err
 }
@@ -153,7 +152,6 @@ func buildKrb5Template(realm, domainController string) string {
 // handleKerbError return a boolean to indicate if the error is important or only a debug and rewrite the error string
 func handleKerbError(err error) (bool, string) {
 	eString := err.Error()
-
 	// handle non KRB errors
 	if strings.Contains(eString, "client does not have a username") {
 		return true, "Skipping blank username"
