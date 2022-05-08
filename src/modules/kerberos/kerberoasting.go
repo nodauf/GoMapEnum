@@ -10,7 +10,8 @@ import (
 func (options *Options) Kerberoasting(username string) string {
 
 	optionsInterface := reflect.ValueOf(options).Interface()
-	if !KerberosSession(&optionsInterface) {
+	// check options.kerberosConfig to initialize only once
+	if options.kerberosConfig == nil && !KerberosSession(&optionsInterface) {
 		options.Log.Fatal("Cannot initialize Kerberos session")
 	}
 	valid, client, err := options.authenticate(options.Users, options.Passwords)
@@ -33,7 +34,7 @@ func (options *Options) Kerberoasting(username string) string {
 	optionsLDAP.Log = tmpLog
 	optionsLDAP.Log.Level = logger.ErrorLevel
 	optionsLDAP.Log.Module = "LDAP\t"
-	optionsLDAP.TLS = "StartTLS"
+	optionsLDAP.TLS = "NoTLS"
 	optionsLDAP.Users = options.Users
 	optionsLDAP.Passwords = options.Passwords
 	optionsLDAP.Target = options.Target
