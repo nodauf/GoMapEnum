@@ -112,6 +112,45 @@ func TestAuthenticateNTLMWithHash(t *testing.T) {
 
 }
 
+func TestAuthenticate(t *testing.T) {
+	type testUser struct {
+		username string
+		password string
+		err      string
+		valid    bool
+	}
+
+	var results []testUser
+	results = append(results, testUser{username: "gomapenumUser1", password: "i3siLdA1se!", err: "", valid: true})
+	results = append(results, testUser{username: "gomapenumUser2", password: "", err: "", valid: true})
+	results = append(results, testUser{username: "gomapenumUser3", password: "i3siLdA1se!", err: "", valid: true})
+	results = append(results, testUser{username: "gomapenumUser4", password: "i3siLdA1se!", err: "account disabled", valid: true})
+	results = append(results, testUser{username: "gomapenumUser6", password: "i3siLdA1se!", err: "user must reset password", valid: true})
+	results = append(results, testUser{username: "gomapenumUser1", password: "wrongPassword", err: "Invalid Credentials", valid: false})
+	results = append(results, testUser{username: "wrongUser", password: "wrongPassword", err: "Invalid Credentials", valid: false})
+
+	options := Options{}
+	options.Target = "192.168.1.60"
+	options.TLS = "NoTLS"
+	options.UseNTLM = true
+	log := logger.New("Bruteforce", "SMB", options.Target)
+	log.SetLevel(logger.FatalLevel)
+	options.Log = log
+
+	for _, wantedResults := range results {
+		valid, err := options.authenticate(wantedResults.username, wantedResults.password)
+		options.ldapConn.Close()
+		if !(err == nil && wantedResults.err == "") && !strings.Contains(err.Error(), wantedResults.err) {
+			t.Errorf("Authentication for %s/%s returned %v and was expected %v", wantedResults.username, wantedResults.password, err, wantedResults.err)
+		}
+
+		if valid != wantedResults.valid {
+			t.Errorf("Authentication for %s/%s returned %v and was expected %v", wantedResults.username, wantedResults.password, valid, wantedResults.valid)
+		}
+	}
+
+}
+
 /*func TestAuthenticateSimpleWithPassword(t *testing.T) {
 	var results = make(map[string]int)
 	results["gomapenumUser1/i3siLdA1se!"] = 0

@@ -55,6 +55,7 @@ func main() {
 	createUserWithoutPreAuth("gomapenumUser3", baseDN, ldapConn)
 	createDisabledUser("gomapenumUser4", baseDN, ldapConn)
 	createUserWithSPN("gomapenumUser5", baseDN, ldapConn)
+	createUserPasswordExpired("gomapenumUser6", baseDN, ldapConn)
 
 	fmt.Println("Enter to delete these entries ...")
 
@@ -67,6 +68,7 @@ func main() {
 	deleteUser("gomapenumUser3", baseDN, ldapConn)
 	deleteUser("gomapenumUser4", baseDN, ldapConn)
 	deleteUser("gomapenumUser5", baseDN, ldapConn)
+	deleteUser("gomapenumUser6", baseDN, ldapConn)
 
 }
 
@@ -157,6 +159,42 @@ func createUserWithoutPreAuth(username, baseDN string, ldapConn *ldap.Conn) {
 
 	if err != nil {
 		fmt.Printf("Password could not be changed: %s\n", err.Error())
+	}
+}
+
+func createUserPasswordExpired(username, baseDN string, ldapConn *ldap.Conn) {
+	// Create the user
+	uac := strconv.Itoa(UAC_NORMAL_ACCOUNT | UAC_PASSWD_NOTREQD)
+	add := ldap.NewAddRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	add.Attribute("description", []string{"GoMapEnum test"})
+	add.Attribute("sAMAccountName", []string{username})
+	add.Attribute("userAccountControl", []string{uac})
+	add.Attribute("objectClass", []string{"top", "person", "organizationalPerson", "user"})
+	add.Attribute("pwdLastSet", []string{"0"})
+
+	err := ldapConn.Add(add)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Reset the password
+	utf16 := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	// According to the MS docs in the links above
+	// The password needs to be enclosed in quotes
+	pwdEncoded, _ := utf16.NewEncoder().String(PASSWORD)
+	passReq := ldap.NewModifyRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	passReq.Replace("unicodePwd", []string{pwdEncoded})
+	err = ldapConn.Modify(passReq)
+
+	if err != nil {
+		fmt.Printf("Password could not be changed: %s\n", err.Error())
+	}
+
+	passwordExpire := ldap.NewModifyRequest("CN="+username+",CN=Users,"+baseDN, nil)
+	passwordExpire.Replace("pwdLastSet", []string{"0"})
+	err = ldapConn.Modify(passwordExpire)
+
+	if err != nil {
+		fmt.Printf("Could not expire the user's password: %s\n", err.Error())
 	}
 }
 
