@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	ldaplib "github.com/go-ldap/ldap/v3"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/proxy"
 )
@@ -49,7 +48,6 @@ func init() {
 	//KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Hash, "hash", "H", "", "Hash or file containing the hashes")
 	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Target, "target", "t", "", "Host pointing to the kerberos server")
 	KerberosCmd.PersistentFlags().StringVarP(&kerberosOptions.Domain, "domain", "d", "", "Domain for the authentication in netbios format (by default the domain name will be guessed with a ldap connection)")
-	KerberosCmd.PersistentFlags().IntVar(&kerberosOptions.Timeout, "timeout", int(ldaplib.DefaultTimeout.Seconds()), "Timeout for the kerberos connection in seconds")
 	KerberosCmd.PersistentFlags().IntVar(&kerberosOptions.Thread, "thread", 2, "Number of threads")
 
 	KerberosCmd.AddCommand(enumCmd)
