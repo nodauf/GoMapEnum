@@ -17,9 +17,9 @@ func KerberosSession(optionsInterface *interface{}) bool {
 		tmpLog := new(logger.Logger)
 		*tmpLog = *options.Log
 		optionsLDAP.Log = tmpLog
-		optionsLDAP.Log.Level = logger.ErrorLevel
+		optionsLDAP.Log.Level = options.Log.Level
 		optionsLDAP.Log.Module = "LDAP\t"
-		optionsLDAP.TLS = "StartTLS"
+		optionsLDAP.TLS = "NoTLS"
 		optionsLDAP.Target = options.Target
 		optionsLDAP.ProxyHTTP = options.ProxyHTTP
 		err := optionsLDAP.GetDefaultNamingContext()
