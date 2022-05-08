@@ -66,7 +66,7 @@ func TestKerberoasting(t *testing.T) {
 	optionsInterface := reflect.ValueOf(&options).Interface()
 
 	KerberosSession(&optionsInterface)
-	cl, _ := options.authenticate("vagrant", "vagrant")
+	_, cl, _ := options.authenticate("vagrant", "vagrant")
 	for usernameWithSPN, wantedResults := range results {
 		username := strings.Split(usernameWithSPN, "-")[0]
 		spn := strings.Split(usernameWithSPN, "-")[1]
@@ -111,7 +111,7 @@ func TestBruteforce(t *testing.T) {
 	for usernameWithPassword, wantedResults := range results {
 		username := strings.Split(usernameWithPassword, "/")[0]
 		password := strings.Split(usernameWithPassword, "/")[1]
-		_, err := options.authenticate(username, password)
+		_, _, err := options.authenticate(username, password)
 		if (err == nil && wantedResults != "") || (err != nil && err.Error() != wantedResults) {
 			t.Errorf("Authentication for %s returned the error %v and was expected %v", username, err, wantedResults)
 		}

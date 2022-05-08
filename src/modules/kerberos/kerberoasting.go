@@ -13,7 +13,7 @@ func (options *Options) Kerberoasting(username string) string {
 	if !KerberosSession(&optionsInterface) {
 		options.Log.Fatal("Cannot initialize Kerberos session")
 	}
-	client, err := options.authenticate(options.Users, options.Passwords)
+	valid, client, err := options.authenticate(options.Users, options.Passwords)
 	if err != nil {
 		ok, errorString := handleKerbError(err)
 		if ok {
@@ -21,6 +21,10 @@ func (options *Options) Kerberoasting(username string) string {
 		} else {
 			options.Log.Fatal("%s - %s", username, errorString)
 		}
+		return ""
+	}
+	if !valid {
+		options.Log.Error("%s - %s", username, "Invalid credentials")
 		return ""
 	}
 	var optionsLDAP ldap.Options

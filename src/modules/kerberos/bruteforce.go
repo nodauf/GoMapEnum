@@ -8,7 +8,7 @@ import (
 
 func Authenticate(optionsInterface *interface{}, username, password string) bool {
 	options := (*optionsInterface).(*Options)
-	client, err := options.authenticate(username, password)
+	valid, client, err := options.authenticate(username, password)
 	defer client.Destroy()
 	if err != nil {
 		ok, errorString := handleKerbError(err)
@@ -16,13 +16,12 @@ func Authenticate(optionsInterface *interface{}, username, password string) bool
 			options.Log.Fatal("The user %s has been locked out. Abort the bruteforce", username)
 		}
 		if ok {
-			options.Log.Debug("%s - %s", username, errorString)
+			options.Log.Error("%s - %s", username, errorString)
 		} else {
 			options.Log.Fatal("%s - %s", username, errorString)
 		}
-		return false
 	}
-	return true
+	return valid
 
 }
 

@@ -94,26 +94,30 @@ func (options *Options) testUsername(username string) (bool, error) {
 	}
 }
 
-func (options *Options) authenticate(username, password string) (*kclient.Client, error) {
+func (options *Options) authenticate(username, password string) (bool, *kclient.Client, error) {
+	valid := false
 	client := kclient.NewWithPassword(username, options.Domain, password, options.kerberosConfig, kclient.DisablePAFXFAST(true), kclient.Proxy(options.ProxyTCP))
 
 	if ok, err := client.IsConfigured(); !ok {
-		return client, err
+		return valid, client, err
 	}
 	err := client.Login()
 	if err == nil {
-		return client, err
+		valid = true
+		return valid, client, err
 	}
 	eString := err.Error()
 	if strings.Contains(eString, "Password has expired") {
 		// user's password expired, but it's valid!
-		return client, fmt.Errorf("User's password has expired")
+		valid = true
+		err = fmt.Errorf("User's password has expired")
 	}
 	if strings.Contains(eString, "Clock skew too great") {
 		// clock skew off, but that means password worked since PRE-AUTH was successful
-		return client, fmt.Errorf("Clock skew is too great")
+		valid = true
+		err = fmt.Errorf("Clock skew is too great")
 	}
-	return client, err
+	return valid, client, err
 }
 
 func kerberoasting(cl *kclient.Client, username, spn string) string {
@@ -179,6 +183,9 @@ func handleKerbError(err error) (bool, string) {
 	}
 	if strings.Contains(eString, "KRB_AP_ERR_SKEW Clock skew too great") {
 		return true, "Clock skew too great"
+	}
+	if strings.Contains(eString, "password has expired") {
+		return true, eString
 	}
 
 	return false, eString
