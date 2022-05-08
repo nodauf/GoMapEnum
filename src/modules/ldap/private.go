@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/go-ldap/ldap/v3"
@@ -121,6 +122,7 @@ func executeLdapQuery(ldapConn *ldap.Conn, baseDN string, filterAndAttributs map
 }
 
 func (options *Options) authenticate(username, password string) (bool, error) {
+	valid := false
 	options.Log.Verbose("Using domain " + options.Domain + " for authentication. Hostname: " + options.Hostname)
 	var err error
 	if options.UseNTLM {
@@ -129,9 +131,47 @@ func (options *Options) authenticate(username, password string) (bool, error) {
 		err = options.authenticateSimple(username, password)
 	}
 	if err != nil {
-		return false, err
+		// Enrich Invalid credentials error. Source: https://support.hcltechsw.com/csm?id=kb_article&sysparm_article=KB0012749
+		if ldap.IsErrorWithCode(err, ldap.LDAPResultInvalidCredentials) {
+			re, _ := regexp.Compile(".+ comment: AcceptSecurityContext error, data ([0-9a-fA-F]{1,3}), .+$")
+			switch re.FindStringSubmatch(err.Error())[1] {
+			case "525":
+				err = fmt.Errorf("user not found")
+				valid = false
+			case "52e":
+				// Invalid credentials. Do nothing
+				valid = false
+			case "530":
+				err = fmt.Errorf("not permitted to logon at this time")
+				valid = true
+			case "531":
+				err = fmt.Errorf("not permitted to logon at this workstation")
+				valid = true
+			case "532":
+				err = fmt.Errorf("password expired")
+				valid = true
+			case "533":
+				err = fmt.Errorf("account disabled")
+				valid = true
+			case "534":
+				err = fmt.Errorf("the user has not been granted the requested logon type at this machine")
+				valid = true
+			case "701":
+				err = fmt.Errorf("account expired")
+				valid = true
+			case "773":
+				err = fmt.Errorf("user must reset password")
+				valid = true
+			case "775":
+				err = fmt.Errorf("user must reset password")
+				valid = false
+			}
+		}
+
+	} else {
+		valid = true
 	}
-	return true, err
+	return valid, err
 }
 
 // FindLDAPServers attempts to find LDAP servers in a domain via DNS. First it attempts looking up LDAP via SRV records,

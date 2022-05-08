@@ -37,6 +37,9 @@ func Authenticate(optionsInterface *interface{}, username, password string) bool
 			// do nothing
 		case options.StopOnLockout && strings.Contains(err.Error(), "The user account has been automatically locked because too many invalid logon attempts or password change attempts have been requested"):
 			options.Log.Fatal("%s has been locked out", username)
+		case strings.Contains(err.Error(), "The user account has expired"):
+			valid = true
+			options.Log.Verbose("The password %s of %s has expired", password, username)
 		default:
 			options.Log.Error(username + " " + err.Error())
 
