@@ -46,9 +46,11 @@ func (options *Options) Kerberoasting(username string) string {
 		return ""
 	}
 	if username != "" {
-		var spn string
-		kerberoastableAccounts := ldap.ParseLDAPData(optionsLDAP.DumpObject("kerberoastableaccounts"), []string{"sAMAccountName", "servicePrincipalName"})
-		for _, account := range kerberoastableAccounts {
+		// If the SPN is not provided in argument, we retrieve it through the ldap module
+		if spn == "" {
+			// From the LDAP service retrieve all SPN and the find the one corresponding to the username
+			kerberoastableAccounts := ldap.ParseLDAPData(optionsLDAP.DumpObject("kerberoastableaccounts"), []string{"sAMAccountName", "servicePrincipalName"})
+			for _, account := range kerberoastableAccounts {
 			if strings.EqualFold(account[0], username) {
 				spn = account[1]
 			}
@@ -56,6 +58,7 @@ func (options *Options) Kerberoasting(username string) string {
 		if spn == "" {
 			options.Log.Error("cannot find an SPN for %s", username)
 			return ""
+			}
 		}
 		options.Log.Debug("Getting the TGS of %s with spn %s", username, spn)
 		TGS := kerberoasting(client, username, spn)
@@ -65,7 +68,7 @@ func (options *Options) Kerberoasting(username string) string {
 	kerberoastableAccounts := ldap.ParseLDAPData(optionsLDAP.DumpObject("kerberoastableaccounts"), []string{"sAMAccountName", "servicePrincipalName"})
 	var res []string
 	for _, account := range kerberoastableAccounts {
-		res = append(res, options.Kerberoasting(account[0]))
+		res = append(res, options.Kerberoasting(account[0], account[1]))
 	}
 
 	return strings.Join(res, "\n")

@@ -28,7 +28,7 @@ var kerberoastingCmd = &cobra.Command{
 		log.Info("Starting the module Kerberos")
 		kerberosOptions.Log = log
 
-		outputCmd = kerberosOptions.Kerberoasting(targetUser)
+		outputCmd = kerberosOptions.Kerberoasting(targetUser, "")
 	},
 }
 
