@@ -31,7 +31,7 @@ var bruteCmd = &cobra.Command{
 		kerberosOptions.Log = log
 
 		orchestratorOptions := orchestrator.Orchestrator{}
-		orchestratorOptions.PreActionBruteforce = kerberos.KerberosSession
+		orchestratorOptions.PreActionBruteforce = kerberos.InitSession
 		orchestratorOptions.AuthenticationFunc = kerberos.Authenticate
 		orchestratorOptions.UserEnumFunc = kerberos.UserEnum
 		orchestratorOptions.CustomOptionsForCheckIfValid = kerberos.PrepareOptions

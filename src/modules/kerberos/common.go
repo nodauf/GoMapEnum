@@ -8,9 +8,11 @@ import (
 	kconfig "github.com/nodauf/gokrb5/v8/config"
 )
 
-func KerberosSession(optionsInterface *interface{}) bool {
+// InitSession initializes the kerberos client
+func InitSession(optionsInterface *interface{}) bool {
 	var err error
 	options := (*optionsInterface).(*Options)
+	// If the domain is not specified we try to get it with a LDAP request for the default naming context
 	if options.Domain == "" {
 		//options.Domain, _, err = smb.GetTargetInfo(options.Target, options.Timeout, options.ProxyTCP)
 		var optionsLDAP ldap.Options

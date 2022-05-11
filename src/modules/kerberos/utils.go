@@ -63,6 +63,7 @@ func (options *Options) testUsername(username string) (bool, error) {
 		return false, err
 	}
 	rb, err := cl.SendToKDC(b, options.Domain)
+
 	if err == nil {
 		// If no error, we actually got an AS REP, meaning user does not have pre-auth required
 		var ASRep messages.ASRep
@@ -88,6 +89,8 @@ func (options *Options) testUsername(username string) (bool, error) {
 	switch e.ErrorCode {
 	case errorcode.KDC_ERR_PREAUTH_REQUIRED:
 		return true, nil
+	case errorcode.KDC_ERR_CLIENT_REVOKED:
+		return true, err
 	default:
 		return false, err
 
@@ -110,7 +113,6 @@ func (options *Options) authenticate(username, password string) (bool, *kclient.
 	if strings.Contains(eString, "Password has expired") {
 		// user's password expired, but it's valid!
 		valid = true
-		err = fmt.Errorf("User's password has expired")
 	}
 	if strings.Contains(eString, "Clock skew too great") {
 		// clock skew off, but that means password worked since PRE-AUTH was successful
@@ -119,6 +121,7 @@ func (options *Options) authenticate(username, password string) (bool, *kclient.
 	return valid, client, err
 }
 
+// kerberoasting get the service ticket of a SPN
 func kerberoasting(cl *kclient.Client, username, spn string) string {
 	// Just test kerberoasting
 	ticket, _, _ := cl.GetServiceTicket(spn)
@@ -173,7 +176,12 @@ func handleKerbError(err error) (bool, string) {
 	if strings.Contains(eString, "KDC_ERR_PREAUTH_FAILED") {
 		return true, "Invalid password"
 	}
+	// Revoked can be a lot of different errors. The error have be enrich
 	if strings.Contains(eString, "KDC_ERR_CLIENT_REVOKED") {
+		// If the error has detailed information
+		if strings.Split(eString, "-")[1] != "" {
+			return true, strings.TrimSpace(strings.Split(eString, "-")[1])
+		}
 		return true, "USER LOCKED OUT"
 	}
 	if strings.Contains(eString, " AS_REP is not valid or client password/keytab incorrect") {
@@ -182,7 +190,7 @@ func handleKerbError(err error) (bool, string) {
 	if strings.Contains(eString, "KRB_AP_ERR_SKEW Clock skew too great") {
 		return true, "Clock skew too great"
 	}
-	if strings.Contains(eString, "password has expired") {
+	if strings.Contains(eString, "Password has expired") {
 		return true, eString
 	}
 

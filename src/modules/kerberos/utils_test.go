@@ -17,7 +17,7 @@ func TestTestUsername(t *testing.T) {
 	results["gomapenumUser1"] = ""
 	results["gomapenumUser2"] = ""
 	results["gomapenumUser3"] = ""
-	results["gomapenumUser4"] = "KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_CLIENT_REVOKED)
+	results["gomapenumUser4"] = "KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_CLIENT_REVOKED) + " -  STATUS_ACCOUNT_DISABLED"
 	results["wrongUser"] = "KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_C_PRINCIPAL_UNKNOWN)
 
 	options := Options{}
@@ -28,7 +28,7 @@ func TestTestUsername(t *testing.T) {
 	options.Log = log
 	optionsInterface := reflect.ValueOf(&options).Interface()
 
-	KerberosSession(&optionsInterface)
+	InitSession(&optionsInterface)
 
 	for username, wantedResults := range results {
 		ok, err := options.testUsername(username)
@@ -65,7 +65,7 @@ func TestKerberoasting(t *testing.T) {
 	options.Log = log
 	optionsInterface := reflect.ValueOf(&options).Interface()
 
-	KerberosSession(&optionsInterface)
+	InitSession(&optionsInterface)
 	_, cl, _ := options.authenticate("vagrant", "vagrant")
 	for usernameWithSPN, wantedResults := range results {
 		username := strings.Split(usernameWithSPN, "-")[0]
@@ -95,7 +95,7 @@ func TestBruteforce(t *testing.T) {
 	results["gomapenumUser1/i3siLdA1se!"] = ""
 	results["gomapenumUser2/"] = "client has neither a keytab nor a password set and no session"
 	results["gomapenumUser3/i3siLdA1se!"] = ""
-	results["gomapenumUser4/i3siLdA1se!"] = "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_CLIENT_REVOKED)
+	results["gomapenumUser4/i3siLdA1se!"] = "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_CLIENT_REVOKED) + " -  STATUS_ACCOUNT_DISABLED"
 	results["gomapenumUser1/wrongPassword"] = "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_PREAUTH_FAILED)
 	results["wrongUser/wrongPassword"] = "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_C_PRINCIPAL_UNKNOWN)
 
@@ -107,7 +107,7 @@ func TestBruteforce(t *testing.T) {
 	options.Log = log
 	optionsInterface := reflect.ValueOf(&options).Interface()
 
-	KerberosSession(&optionsInterface)
+	InitSession(&optionsInterface)
 	for usernameWithPassword, wantedResults := range results {
 		username := strings.Split(usernameWithPassword, "/")[0]
 		password := strings.Split(usernameWithPassword, "/")[1]
@@ -116,4 +116,43 @@ func TestBruteforce(t *testing.T) {
 			t.Errorf("Authentication for %s returned the error %v and was expected %v", username, err, wantedResults)
 		}
 	}
+}
+
+func TestAuthenticate(t *testing.T) {
+	type testUser struct {
+		username string
+		password string
+		err      string
+		valid    bool
+	}
+
+	var results []testUser
+	results = append(results, testUser{username: "gomapenumUser1", password: "i3siLdA1se!", err: "", valid: true})
+	results = append(results, testUser{username: "gomapenumUser2", password: "", err: "", valid: false})
+	results = append(results, testUser{username: "gomapenumUser3", password: "i3siLdA1se!", err: "", valid: true})
+	results = append(results, testUser{username: "gomapenumUser4", password: "i3siLdA1se!", err: "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_CLIENT_REVOKED) + " -  STATUS_ACCOUNT_DISABLED", valid: false}) // The same error is returned if the account is disabled or locked out
+	results = append(results, testUser{username: "gomapenumUser6", password: "i3siLdA1se!", err: "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_KEY_EXPIRED), valid: true})
+	results = append(results, testUser{username: "gomapenumUser1", password: "wrongPassword", err: "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_PREAUTH_FAILED), valid: false})
+	results = append(results, testUser{username: "wrongUser", password: "wrongPassword", err: "[Root cause: KDC_Error] KDC_Error: AS Exchange Error: kerberos error response from KDC: KRB Error: " + errorcode.Lookup(errorcode.KDC_ERR_C_PRINCIPAL_UNKNOWN), valid: false})
+
+	options := Options{}
+	options.Target = "192.168.1.60"
+	log := logger.New("Bruteforce", "Kerberos", options.Target)
+	log.SetLevel(logger.FatalLevel)
+	options.Log = log
+	optionsInterface := reflect.ValueOf(&options).Interface()
+
+	InitSession(&optionsInterface)
+	for _, wantedResults := range results {
+		valid, cl, err := options.authenticate(wantedResults.username, wantedResults.password)
+		cl.Destroy()
+		if !(err == nil && wantedResults.err == "") && !strings.Contains(err.Error(), wantedResults.err) {
+			t.Errorf("Authentication for %s/%s returned %v and was expected %v", wantedResults.username, wantedResults.password, err, wantedResults.err)
+		}
+
+		if valid != wantedResults.valid {
+			t.Errorf("Authentication for %s/%s returned %v and was expected %v", wantedResults.username, wantedResults.password, valid, wantedResults.valid)
+		}
+	}
+
 }

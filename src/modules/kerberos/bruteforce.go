@@ -11,8 +11,9 @@ func Authenticate(optionsInterface *interface{}, username, password string) bool
 	valid, client, err := options.authenticate(username, password)
 	defer client.Destroy()
 	if err != nil {
+		options.Log.Debug(err.Error())
 		ok, errorString := handleKerbError(err)
-		if strings.Contains(errorString, "LOCKED OUT") && options.StopOnLockout {
+		if strings.Contains(errorString, "STATUS_ACCOUNT_LOCKED_OUT") && options.StopOnLockout {
 			options.Log.Fatal("The user %s has been locked out. Abort the bruteforce", username)
 		}
 		if ok {
