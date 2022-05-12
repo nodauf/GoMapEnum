@@ -6,8 +6,10 @@ import (
 
 // UserEnum return a valid list of users according the provided options
 func UserEnum(optionsInterface *interface{}, username string) bool {
+	if !CheckTenant(optionsInterface, username) {
+		return false
+	}
 	options := (*optionsInterface).(*Options)
-
 	switch options.Mode {
 	case "office":
 		return options.enumOffice(username)
@@ -22,6 +24,7 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 
 }
 
+// CheckTenant return true if the tenant is valid and exist on o365
 func CheckTenant(optionsInterface *interface{}, username string) bool {
 	options := (*optionsInterface).(*Options)
 	// If it's empty we initialize the map
