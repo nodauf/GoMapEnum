@@ -43,7 +43,9 @@ func Authenticate(optionsInterface *interface{}, email, password string) bool {
 
 	case "autodiscover":
 		// We have no information on account lockout
-		valid = bruteAutodiscover(email, password)
+		valid = false
+		options.Log.Fatal("Mode autodiscover not implemented yet")
+		//valid = bruteAutodiscover(email, password)
 	}
 
 	return valid

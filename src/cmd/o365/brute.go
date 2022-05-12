@@ -4,8 +4,6 @@ import (
 	"GoMapEnum/src/logger"
 	"GoMapEnum/src/modules/o365"
 	"GoMapEnum/src/orchestrator"
-	"errors"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -19,13 +17,19 @@ Beware of account locking. Locking information is only available on oauth2 and t
 By default, if one account is being lock, the all attack will be stopped.
 	Credits: https://github.com/0xZDH/o365spray`,
 	Example: `go run main.go o365 brute -u john.doe@contoso.com  -p passwordFile -s 10 --stopOnLockout=False`,
-	PreRunE: func(cmd *cobra.Command, args []string) error {
+	/*PreRunE: func(cmd *cobra.Command, args []string) error {
+		// Issue (https://github.com/spf13/cobra/issues/1047) with the default value of a flag that is used in two subcommand
+		// Some ugly workaround here. If the mode is the default of the other command we switch to the default of this one: oauth2
+		if o365Options.Mode == "office" {
+			o365Options.Mode = "oauth2"
+		}
+
 		o365Options.Mode = strings.ToLower(o365Options.Mode)
 		if o365Options.Mode != "oauth2" && o365Options.Mode != "autodiscover" {
-			return errors.New("invalid mode. Should be oauth2 or autodiscover")
+			return errors.New(o365Options.Mode + " is an invalid mode. Should be oauth2 or autodiscover")
 		}
 		return nil
-	},
+	},*/
 	Run: func(cmdCli *cobra.Command, args []string) {
 		log := logger.New("Bruteforce", "O365", "https://login.microsoftonline.com")
 		log.SetLevel(level)
@@ -44,7 +48,7 @@ func init() {
 
 	bruteCmd.Flags().BoolVarP(&o365Options.CheckIfValid, "check", "c", true, "Check if the user is valid before trying password")
 	bruteCmd.Flags().BoolVarP(&o365Options.NoBruteforce, "no-bruteforce", "n", false, "No spray when using file for username and password (user1 => password1, user2 => password2)")
-	bruteCmd.Flags().StringVarP(&o365Options.Mode, "mode", "m", "oauth2", "Choose a mode between oauth2 and autodiscover (no failsafe for lockout) <- not implemented")
+	//bruteCmd.Flags().StringVarP(&o365Options.Mode, "mode", "m", "oauth2", "oauth2")
 	bruteCmd.Flags().StringVarP(&o365Options.Users, "user", "u", "", "User or file containing the emails")
 	bruteCmd.Flags().StringVarP(&o365Options.Passwords, "password", "p", "", "Password or file containing the passwords")
 	bruteCmd.Flags().IntVarP(&o365Options.Sleep, "sleep", "s", 0, "Sleep in seconds before sending an authentication request")
