@@ -19,9 +19,9 @@ var enumCmd = &cobra.Command{
 	Example: `go run main.go azure userenum -u john.doe@contoso.com
 	go run main.go o365 userenum -u users -o validUsers`,
 	Run: func(cmdCli *cobra.Command, args []string) {
-		log := logger.New("Enumeration", "o365", "https://login.microsoftonline.com")
+		log := logger.New("Enumeration", "O365", "https://login.microsoftonline.com")
 		log.SetLevel(level)
-		log.Info("Starting the module o365")
+		log.Info("Starting the module O365")
 		o365Options.Log = log
 
 		orchestratorOptions := orchestrator.Orchestrator{}
@@ -41,5 +41,7 @@ func init() {
 
 	enumCmd.Flags().StringVarP(&o365Options.Users, "user", "u", "", "User or file containing the emails")
 	enumCmd.Flags().IntVar(&o365Options.Thread, "thread", 2, "Number of threads")
+	enumCmd.Flags().StringVarP(&o365Options.Mode, "mode", "m", "office", "Choose a mode between office and oauth2 (office mode does not try to authenticate) ")
+
 	enumCmd.MarkFlagRequired("user")
 }
