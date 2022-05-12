@@ -164,7 +164,7 @@ func (options *Options) enumOauth2(username string) bool {
 			options.Log.Error(username + " The application wasn't found in the directory/tenant")
 		case "AADSTS50034": // UserAccountNotFound - To sign into this application, the account must be added to the directory.
 			options.Log.Fail(username + " does not exist")
-		case "AADSTS90002":
+		case "AADSTS90002", "AADSTS50059":
 			options.Log.Error("The Tenant '" + username + "' does not exist")
 		default:
 			options.Log.Error("Unknow error: " + respStruct.ErrorDescription)
@@ -212,7 +212,7 @@ func (options *Options) bruteOauth2(username, password string) (bool, error) {
 			options.Log.Error(username + " The application wasn't found in the directory/tenant")
 		case "AADSTS50034": // UserAccountNotFound - To sign into this application, the account must be added to the directory.
 			options.Log.Fail(username + " does not exist")
-		case "AADSTS90002":
+		case "AADSTS90002", "AADSTS50059":
 			options.Log.Error("The Tenant '" + username + "' does not exist")
 		default:
 			options.Log.Error("Unknow error: " + respStruct.ErrorDescription)
