@@ -279,12 +279,15 @@ func OpenConnectionWoProxy(target, port string, timeout int, proxyTCP proxy.Dial
 	return conn, nil
 }
 
-func GetHmacMd5(data []byte, key []byte) []byte {
+// GetHmacMd5 returns the hmac of the given string with the given key
+func GetHmacMd5(data, key []byte) []byte {
 	mac := hmac.New(md5.New, key)
 	mac.Write(data)
 	return mac.Sum(nil)
 }
-func RC4Decrypt(encData []byte, key []byte) ([]byte, error) {
+
+// RC4Decrypt decrypts the given data with the given key with RC4 algorithm
+func RC4Decrypt(encData, key []byte) ([]byte, error) {
 	dst := make([]byte, len(encData))
 	rc4cipher, err := rc4.NewCipher(key)
 

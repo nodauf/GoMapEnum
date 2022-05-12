@@ -269,7 +269,7 @@ func authenticateNTLM(target, domain, username, password string, isHash bool) (*
 	}
 	return ldapConn, err
 }
-func establisheConnection(target string, TLSMode string, timeout int, proxyTCP proxy.Dialer) (*ldap.Conn, error) {
+func establisheConnection(target, TLSMode string, timeout int, proxyTCP proxy.Dialer) (*ldap.Conn, error) {
 
 	var port string
 	switch strings.ToLower(TLSMode) {
