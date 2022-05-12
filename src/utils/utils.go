@@ -182,6 +182,7 @@ func IndexInSlice(slice []string, value string) int {
 	return -1
 }
 
+// StringInSlice returns true if the string is present in the slice, otherwise false
 func StringInSlice(sliceStr []string, str string) bool {
 	for _, value := range sliceStr {
 		if value == str {
@@ -213,6 +214,8 @@ func StringInSlice(sliceStr []string, str string) bool {
 	t.Execute(&tpl, data)
 	return tpl
 }*/
+
+// DataToHTML returns a datatables html page. It takes as input the rows, the columns and the title.
 func DataToHTML(rows [][]string, columns []string, title string) bytes.Buffer {
 
 	var tpl bytes.Buffer
@@ -221,8 +224,6 @@ func DataToHTML(rows [][]string, columns []string, title string) bytes.Buffer {
 	}
 
 	t, _ := template.New("datatables.tpl").Funcs(customFunctions).Parse(templateResources.GetTemplateDatatables())
-	//t, err := template.ParseFiles("template/datatables.tpl")
-	//f, _ := os.Create("users.html")
 
 	data := struct {
 		Rows    [][]string
@@ -237,6 +238,7 @@ func DataToHTML(rows [][]string, columns []string, title string) bytes.Buffer {
 	return tpl
 }
 
+// SearchInStruct iterate over the a struct to search for a field name (column parameter) and return the value separeted by a new line
 func SearchInStruct(item reflect.Value, column string) string {
 	var element string
 	switch item.FieldByName(column).Type().Kind() {
@@ -257,6 +259,7 @@ func SearchInStruct(item reflect.Value, column string) string {
 	return element
 }
 
+// OpenConnectionWoProxy open a connection to the given url with a proxy or not if not given.
 func OpenConnectionWoProxy(target, port string, timeout int, proxyTCP proxy.Dialer) (net.Conn, error) {
 	var conn net.Conn
 	var err error
@@ -264,10 +267,12 @@ func OpenConnectionWoProxy(target, port string, timeout int, proxyTCP proxy.Dial
 		// Use the proxy dialer
 		conn, err = proxyTCP.Dial("tcp", net.JoinHostPort(target, port))
 	} else {
+		// If not proxy is given
 		defaultDialer := &net.Dialer{Timeout: time.Duration(timeout * int(time.Second))}
 		conn, err = defaultDialer.Dial("tcp", net.JoinHostPort(target, port))
 	}
 
+	// Check the error
 	if err != nil || conn == nil {
 		var errStr string
 		if err != nil {
