@@ -261,10 +261,11 @@ func OpenConnectionWoProxy(target, port string, timeout int, proxyTCP proxy.Dial
 	var conn net.Conn
 	var err error
 	if proxyTCP != nil {
-		conn, err = proxyTCP.Dial("tcp", fmt.Sprintf("%s:%s", target, port))
+		// Use the proxy dialer
+		conn, err = proxyTCP.Dial("tcp", net.JoinHostPort(target, port))
 	} else {
 		defaultDialer := &net.Dialer{Timeout: time.Duration(timeout * int(time.Second))}
-		conn, err = defaultDialer.Dial("tcp", fmt.Sprintf("%s:%s", target, port))
+		conn, err = defaultDialer.Dial("tcp", net.JoinHostPort(target, port))
 	}
 
 	if err != nil || conn == nil {
