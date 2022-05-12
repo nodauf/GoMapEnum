@@ -217,7 +217,7 @@ func DataToHTML(rows [][]string, columns []string, title string) bytes.Buffer {
 
 	var tpl bytes.Buffer
 	customFunctions := template.FuncMap{
-		"replace": func(input, from, to string) string { return strings.Replace(input, from, to, -1) },
+		"replace": func(input, from, to string) string { return strings.ReplaceAll(input, from, to) },
 	}
 
 	t, _ := template.New("datatables.tpl").Funcs(customFunctions).Parse(templateResources.GetTemplateDatatables())

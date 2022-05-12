@@ -29,7 +29,7 @@ func InitSession(optionsInterface *interface{}) bool {
 			options.Log.Error("Fail to connect to ldap to retrieve the default naming context to get the domain name in netbios format: %v. Please provide the domain with -d flag.", err.Error())
 			return false
 		}
-		options.Domain = strings.Replace(strings.ReplaceAll(optionsLDAP.BaseDN, "DC=", ""), ",", ".", -1)
+		options.Domain = strings.ReplaceAll(strings.ReplaceAll(optionsLDAP.BaseDN, "DC=", ""), ",", ".")
 	}
 	options.Domain = strings.ToUpper(options.Domain)
 	configstring := buildKrb5Template(options.Domain, options.Target)
