@@ -13,8 +13,6 @@ import (
 var level logger.Level
 var verbose bool
 var debug bool
-var noBruteforce bool
-var sleep int
 var validUsers string
 var output string
 var proxyString string
