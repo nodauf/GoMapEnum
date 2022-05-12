@@ -154,10 +154,10 @@ func UniqueSliceString(list []string) []string {
 }
 
 // SearchReplaceMap will search and replace a string by another in all the map
-func SearchReplaceMap(mapToReplace map[string]string, old, new string) map[string]string {
+func SearchReplaceMap(mapToReplace map[string]string, oldString, newString string) map[string]string {
 	var newMap = make(map[string]string)
 	for key, value := range mapToReplace {
-		value = strings.ReplaceAll(value, old, new)
+		value = strings.ReplaceAll(value, oldString, newString)
 		newMap[key] = value
 	}
 	return newMap
