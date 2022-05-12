@@ -17,11 +17,11 @@ var enumCmd = &cobra.Command{
 	Long: `The authentication process does not seem to work but the error code can still give information if the user's account exist or not
 	Credits https://github.com/treebuilder/aad-sso-enum-brute-spray`,
 	Example: `go run main.go azure userenum -u john.doe@contoso.com
-	go run main.go userenum azure -u users -o validUsers`,
+	go run main.go o365 userenum -u users -o validUsers`,
 	Run: func(cmdCli *cobra.Command, args []string) {
 		log := logger.New("Enumeration", "o365", "https://login.microsoftonline.com")
 		log.SetLevel(level)
-		log.Info("Starting the module Azure")
+		log.Info("Starting the module o365")
 		o365Options.Log = log
 
 		orchestratorOptions := orchestrator.Orchestrator{}

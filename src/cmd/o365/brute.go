@@ -18,7 +18,7 @@ var bruteCmd = &cobra.Command{
 Beware of account locking. Locking information is only available on oauth2 and therefore failsafe is only set up on oauth2.
 By default, if one account is being lock, the all attack will be stopped.
 	Credits: https://github.com/0xZDH/o365spray`,
-	Example: `go run main.go o365 bruteSpray  -u john.doe@contoso.com  -p passwordFile -s 10 -l 2`,
+	Example: `go run main.go o365 brute -u john.doe@contoso.com  -p passwordFile -s 10 --stopOnLockout=False`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		o365Options.Mode = strings.ToLower(o365Options.Mode)
 		if o365Options.Mode != "oauth2" && o365Options.Mode != "autodiscover" {
