@@ -44,13 +44,12 @@ func CheckTenant(optionsInterface *interface{}, username string) bool {
 		}
 		options.Log.Info("Tenant " + domain + " is valid")
 		options.validTenants[domain] = true
-	} else {
+	} else if !domainValid {
 		// If the domain was not valid, skip the email
-		if !domainValid {
-			options.Log.Debug("Tenant " + domain + " already checked and was not valid")
-			options.Mutex.Unlock()
-			return false
-		}
+		options.Log.Debug("Tenant " + domain + " already checked and was not valid")
+		options.Mutex.Unlock()
+		return false
+
 	}
 	options.Mutex.Unlock()
 	return true
