@@ -30,6 +30,11 @@ func (options *Options) initDumpMap() {
 	kerberoastableAccounts["filter"] = "(&(servicePrincipalName=*)(UserAccountControl:1.2.840.113556.1.4.803:=512)(!(UserAccountControl:1.2.840.113556.1.4.803:=2))(!(objectCategory=computer)))"
 	kerberoastableAccounts["attributs"] = "cn,sAMAccountName,servicePrincipalName,PasswordLastSet,LastLogon"
 	options.queries["kerberoastableaccounts"] = kerberoastableAccounts
+
+	adfsKey := make(map[string]string)
+	adfsKey["filter"] = "(&(thumbnailphoto=*)(objectClass=contact)(!(cn=CryptoPolicy)))"
+	adfsKey["attributs"] = "dn,thumbnailPhoto"
+	options.queries["adfskey"] = adfsKey
 }
 
 func (options *Options) authenticateSimple(username, password string) error {
