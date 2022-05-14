@@ -6,6 +6,7 @@ import (
 	"GoMapEnum/src/cmd/kerberos"
 	"GoMapEnum/src/cmd/ldap"
 	"GoMapEnum/src/cmd/linkedin"
+	"GoMapEnum/src/cmd/ntp"
 	"GoMapEnum/src/cmd/o365"
 	"GoMapEnum/src/cmd/owa"
 	"GoMapEnum/src/cmd/searchEngine"
@@ -44,6 +45,7 @@ func init() {
 	rootCmd.AddCommand(ldap.LdapCmd)
 	rootCmd.AddCommand(linkedin.LinkedinCmd)
 	rootCmd.AddCommand(kerberos.KerberosCmd)
+	rootCmd.AddCommand(ntp.NTPCmd)
 	rootCmd.AddCommand(o365.O365Cmd)
 	rootCmd.AddCommand(owa.OwaCmd)
 	rootCmd.AddCommand(searchEngine.SearchEngineCmd)
