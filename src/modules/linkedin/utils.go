@@ -82,10 +82,26 @@ func (options *Options) getPeople(companyID, start int) []string {
 				email = strings.ReplaceAll(email, "{f}", name[0][0:1])
 				email = strings.ReplaceAll(email, "{last}", name[1])
 				email = strings.ReplaceAll(email, "{l}", name[1][0:1])
+				email = strings.ReplaceAll(email, "{l2}", name[1][0:2])
+				email = strings.ToLower(unidecode.Unidecode(email))
+				log.Success(email + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text)
+				output = append(output, email)
+			} else if len(name) > 2 && options.Email {
+				var email string
+				var last string
+				email = options.Format
+				last =  strings.TrimRight(name[1],",")
+				log.Verbose(name[0] + " - " + name[1])
+				email = strings.ReplaceAll(email, "{first}", name[0])
+				email = strings.ReplaceAll(email, "{f}", name[0][0:1])
+				email = strings.ReplaceAll(email, "{last}", last)
+				email = strings.ReplaceAll(email, "{l}", last[0:1])
+				email = strings.ReplaceAll(email, "{l2}", last[0:2])
 				email = strings.ToLower(unidecode.Unidecode(email))
 				log.Success(email + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text)
 				output = append(output, email)
 			}
+
 			if !options.Email {
 				result := people.Title.Text + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text
 				log.Success(result)
