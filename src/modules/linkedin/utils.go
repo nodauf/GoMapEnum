@@ -98,7 +98,7 @@ func (options *Options) getPeople(companyID, start int) []string {
 	// If we had people, it means we are not in last page
 	if numberPeople > 0 {
 		next := start + numberPeople
-		output = append(options.getPeople(companyID, next), output...)
+		output = append(output, options.getPeople(companyID, next)...)
 	}
 	return output
 }

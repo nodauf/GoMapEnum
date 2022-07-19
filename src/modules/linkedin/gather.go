@@ -29,7 +29,7 @@ func (options *Options) Gather() string {
 			log.Debug("Company name: " + companyLinkedinName + " match")
 			companyID, _ := strconv.Atoi(strings.Split(company.EntityLockupView.TrackingUrn, ":")[3])
 			// Get the people of the company, starting from 0
-			output = options.getPeople(companyID, 0)
+			output = append(output, options.getPeople(companyID, 0)...)
 			log.Debug("Found " + strconv.Itoa(len(output)) + " peoples for " + options.Company)
 		}
 	}
