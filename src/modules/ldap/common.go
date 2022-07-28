@@ -11,12 +11,14 @@ func RetrieveTargetInfo(optionsInterface *interface{}) bool {
 	options := (*optionsInterface).(*Options)
 	var err error
 	if options.Domain == "" {
+		options.Log.Debug("Domain is not specified, trying to retrieve it from the target through smb")
 		options.Domain, options.Hostname, err = smb.GetTargetInfo(options.Target, options.Timeout, options.ProxyTCP)
 		if err != nil {
 			options.Log.Error("Fail to connect to smb to retrieve the domain name: %s. Please provide the domain with -d flag.", err.Error())
 			return false
 		}
 	} else if options.Target == "" {
+		options.Log.Debug("Target is not specified, trying to retrieve it from the target through DNS")
 		ldapServers, _ := findLDAPServers(options.Domain)
 		options.Target = ldapServers[0]
 	}

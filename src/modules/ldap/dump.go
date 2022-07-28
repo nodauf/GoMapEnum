@@ -28,6 +28,7 @@ func (options *Options) InitLDAP() bool {
 		}
 		return false
 	}
+	options.Log.Debug("Connected to LDAP")
 	err = options.GetDefaultNamingContext()
 	if err != nil {
 		options.Log.Error("fail to retrieve the default naming context, error: %v", err)
