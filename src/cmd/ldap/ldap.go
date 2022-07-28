@@ -66,7 +66,7 @@ func init() {
 	LdapCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Verbose")
 	LdapCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Debug")
 	LdapCmd.PersistentFlags().BoolVar(&ldapOptions.UseNTLM, "NTLM", true, "Authenticate with NTLM")
-	LdapCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The out file for valid emails")
+	LdapCmd.PersistentFlags().StringVarP(&output, "output-file", "o", "", "The output file")
 	LdapCmd.PersistentFlags().StringVar(&proxyString, "proxy", "", "Socks5 proxy to use (ex: localhost:8080)")
 	LdapCmd.PersistentFlags().StringVar(&ldapOptions.TLS, "tls", "NoTLS", "TLS mode (NoTLS, TLS, StartTLS))")
 	LdapCmd.PersistentFlags().StringVarP(&ldapOptions.Users, "user", "u", "", "User or file containing the emails")
