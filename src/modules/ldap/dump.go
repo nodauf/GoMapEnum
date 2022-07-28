@@ -65,7 +65,10 @@ func (options *Options) Dump() string {
 				if err != nil {
 					options.Log.Error("fail to convert the data to json, error: %v", err)
 				} else {
-					ioutil.WriteFile(object+".json", []byte(jsonOutput), fs.ModePerm)
+					err = ioutil.WriteFile(object+".json", []byte(jsonOutput), fs.ModePerm)
+					if err != nil {
+						options.Log.Error("fail to write the data to json, error: %v", err)
+					}
 
 				}
 				if err != nil {
@@ -80,7 +83,10 @@ func (options *Options) Dump() string {
 				columns := strings.Split(options.queries[object]["attributs"], ",")
 				rows := ParseLDAPData(ldapData, columns)
 				template := utils.DataToHTML(rows, columns, object)
-				ioutil.WriteFile(object+".html", template.Bytes(), fs.ModePerm)
+				err := ioutil.WriteFile(object+".html", template.Bytes(), fs.ModePerm)
+				if err != nil {
+					options.Log.Error("fail to write the data to json, error: %v", err)
+				}
 
 			}
 		}
