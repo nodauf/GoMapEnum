@@ -62,7 +62,10 @@ func GetTargetInfo(target string, timeout int, proxyTCP proxy.Dialer) (string, s
 		Initiator: initiator,
 	}
 	s, err := smbDialer.Dial(smbConnection)
-	s.Logoff()
-	return initiator.TargetInfo().DomainName, initiator.TargetInfo().ServerName, nil
+	if err == nil {
+		s.Logoff()
+		return initiator.TargetInfo().DomainName, initiator.TargetInfo().ServerName, nil
+	}
+	return "", "", err
 
 }

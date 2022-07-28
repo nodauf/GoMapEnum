@@ -14,8 +14,11 @@ import (
 
 func (options *Options) InitLDAP() bool {
 	optionsInterface := reflect.ValueOf(options).Interface()
-
-	RetrieveTargetInfo(&optionsInterface)
+	options.Log.Debug("Initializing LDAP")
+	if !RetrieveTargetInfo(&optionsInterface) {
+		options.Log.Error("Cannot initialize LDAP")
+		return false
+	}
 	valid, err := options.authenticate(options.Users, options.Passwords)
 	if !valid || err != nil {
 		if ldap.IsErrorWithCode(err, ldap.LDAPResultInvalidCredentials) {
