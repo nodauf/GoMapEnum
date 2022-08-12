@@ -41,10 +41,13 @@ func (orchestrator *Orchestrator) UserEnum(optionsModules Options) string {
 					}
 				}
 				if orchestrator.UserEnumFunc(&optionsInterface, username) {
+					options.Log.Debug(username + " exists")
 					mux.Lock()
 					validUsers = append(validUsers, username)
 					mux.Unlock()
 				}
+
+				options.Log.Debug(username + " does not exist")
 			}
 		}(i)
 	}
