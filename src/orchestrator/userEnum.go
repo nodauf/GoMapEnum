@@ -45,9 +45,9 @@ func (orchestrator *Orchestrator) UserEnum(optionsModules Options) string {
 					mux.Lock()
 					validUsers = append(validUsers, username)
 					mux.Unlock()
+				} else {
+					options.Log.Debug(username + " does not exist")
 				}
-
-				options.Log.Debug(username + " does not exist")
 			}
 		}(i)
 	}
