@@ -15,22 +15,27 @@ var LINKEDIN_LIST_PEOPLE = "https://www.linkedin.com/voyager/api/search/dash/clu
 func (options *Options) Gather() string {
 	var output []string
 	log = options.Log
-	// Always insensitive case compare
-	options.Company = strings.ToLower(options.Company)
-	// Get all the companies from the option
-	companies := options.getCompany()
-	log.Debug("Found " + strconv.Itoa(len(companies.Elements)) + " companies matching " + options.Company)
-	for _, company := range companies.Elements {
-		// Extract the company name from the struct
-		companyLinkedinName := strings.ToLower(company.EntityLockupView.Title.Text)
-		log.Debug("Checking for " + companyLinkedinName)
-		// If the ID is not empty and check for the company name (exact match or not)
-		if company.EntityLockupView.TrackingUrn != "" && (!options.ExactMatch && strings.Contains(companyLinkedinName, options.Company) || options.ExactMatch && companyLinkedinName == options.Company) {
-			log.Debug("Company name: " + companyLinkedinName + " match")
-			companyID, _ := strconv.Atoi(strings.Split(company.EntityLockupView.TrackingUrn, ":")[3])
-			// Get the people of the company, starting from 0
-			output = append(output, options.getPeople(companyID, 0)...)
-			log.Debug("Found " + strconv.Itoa(len(output)) + " peoples for " + options.Company)
+	if options.CompagnyID != 0 {
+		output = options.getPeople(int(options.CompagnyID), 0)
+		log.Debug("Found " + strconv.Itoa(len(output)) + " peoples for " + options.Company)
+	} else {
+		// Always insensitive case compare
+		options.Company = strings.ToLower(options.Company)
+		// Get all the companies from the option
+		companies := options.getCompanies()
+		log.Debug("Found " + strconv.Itoa(len(companies.Elements)) + " companies matching " + options.Company)
+		for _, company := range companies.Elements {
+			// Extract the company name from the struct
+			companyLinkedinName := strings.ToLower(company.EntityLockupView.Title.Text)
+			log.Debug("Checking for " + companyLinkedinName)
+			// If the ID is not empty and check for the company name (exact match or not)
+			if company.EntityLockupView.TrackingUrn != "" && (!options.ExactMatch && strings.Contains(companyLinkedinName, options.Company) || options.ExactMatch && companyLinkedinName == options.Company) {
+				log.Debug("Company name: " + companyLinkedinName + " match")
+				companyID, _ := strconv.Atoi(strings.Split(company.EntityLockupView.TrackingUrn, ":")[3])
+				// Get the people of the company, starting from 0
+				output = append(output, options.getPeople(companyID, 0)...)
+				log.Debug("Found " + strconv.Itoa(len(output)) + " peoples for " + options.Company)
+			}
 		}
 	}
 

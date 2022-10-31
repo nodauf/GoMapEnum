@@ -11,8 +11,8 @@ import (
 	"github.com/mozillazg/go-unidecode"
 )
 
-// getCompany return a struct that contains all the company of the research
-func (options *Options) getCompany() linkedinListCompany {
+// getCompanies return a struct that contains all the companies of the research
+func (options *Options) getCompanies() linkedinListCompany {
 	var companies linkedinListCompany
 
 	url := fmt.Sprintf(LINKEDIN_LIST_COMPANY, url.QueryEscape(options.Company))
