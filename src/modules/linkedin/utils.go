@@ -11,16 +11,45 @@ import (
 	"github.com/mozillazg/go-unidecode"
 )
 
-// getCompanies return a struct that contains all the companies of the research
-func (options *Options) getCompanies() linkedinListCompany {
-	var companies linkedinListCompany
+// getCompanyInfo return a struct that contains detailed information on a company
+func (options *Options) getCompanyInfo(compagnyID int) linkedinGetCompany {
+	var company linkedinGetCompany
 
-	url := fmt.Sprintf(LINKEDIN_LIST_COMPANY, url.QueryEscape(options.Company))
+	linkedinURL := fmt.Sprintf(LINKEDIN_GET_COMPANY_INFO, compagnyID)
 	header := make(map[string]string)
 	header["csrf-token"] = "ajax:1337"
 	header["x-restli-protocol-version"] = "2.0.0"
 	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
-	body, statusCode, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, header)
+	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header)
+	if err != nil {
+		if strings.Contains(err.Error(), "stopped after 10 redirects") {
+			log.Error("The session cookie may be wrong")
+		}
+		log.Error(err.Error())
+		return company
+	}
+	if statusCode != 200 {
+		log.Error("Something went wrong. Status code " + strconv.Itoa(statusCode) + " != 200. Body: " + body)
+		return company
+	}
+	err = json.Unmarshal([]byte(body), &company)
+	if err != nil {
+		log.Error("Fail to decode the json when requesting %s. Please run with debug flag for more information", linkedinURL)
+		log.Debug(body)
+	}
+	return company
+}
+
+// getCompanies return a struct that contains all the companies of the research
+func (options *Options) getCompanies() linkedinListCompany {
+	var companies linkedinListCompany
+
+	linkedinURL := fmt.Sprintf(LINKEDIN_LIST_COMPANY, url.QueryEscape(options.Company))
+	header := make(map[string]string)
+	header["csrf-token"] = "ajax:1337"
+	header["x-restli-protocol-version"] = "2.0.0"
+	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
+	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header)
 	if err != nil {
 		if strings.Contains(err.Error(), "stopped after 10 redirects") {
 			log.Error("The session cookie may be wrong")
@@ -32,20 +61,24 @@ func (options *Options) getCompanies() linkedinListCompany {
 		log.Error("Something went wrong. Status code " + strconv.Itoa(statusCode) + " != 200. Body: " + body)
 		return companies
 	}
-	json.Unmarshal([]byte(body), &companies)
+	err = json.Unmarshal([]byte(body), &companies)
+	if err != nil {
+		log.Error("Fail to decode the json when requesting %s. Please run with debug flag for more information", linkedinURL)
+		log.Debug(body)
+	}
 	return companies
 }
 
 // getPeople return a list of people belonging to the company
 func (options *Options) getPeople(companyID, start int) []string {
 	var output []string
-	url := fmt.Sprintf(LINKEDIN_LIST_PEOPLE, companyID, start)
+	linkedinURL := fmt.Sprintf(LINKEDIN_LIST_PEOPLE, companyID, start)
 	header := make(map[string]string)
 	header["csrf-token"] = "ajax:1337"
 	header["x-restli-protocol-version"] = "2.0.0"
 	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
 
-	body, statusCode, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, header)
+	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header)
 	if err != nil {
 		log.Error(err.Error())
 		return output
@@ -55,11 +88,15 @@ func (options *Options) getPeople(companyID, start int) []string {
 		return output
 	}
 	var peopleStruct linkedinListPeople
-	json.Unmarshal([]byte(body), &peopleStruct)
+	err = json.Unmarshal([]byte(body), &peopleStruct)
+	if err != nil {
+		log.Error("Fail to decode the json when requesting %s. Please run with debug flag for more information", linkedinURL)
+		log.Debug(body)
+	}
 	numberPeople := 0
 	// The people are in an element of the struct
 	for _, element := range peopleStruct.Elements {
-		// If the result if empty it is either not the right element for the people or there is no more people
+		// If the result is empty it is either not the right element for the people or there is no more people
 		if element.Results == nil {
 			continue
 		}

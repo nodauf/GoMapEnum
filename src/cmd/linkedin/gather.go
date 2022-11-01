@@ -18,6 +18,9 @@ The session cookie is needed to use the Linkedin features.`,
 		if linkedinOptions.Format == "" && linkedinOptions.Email {
 			return errors.New("format flag is requre when email should be guess")
 		}
+		if linkedinOptions.Company != "" && linkedinOptions.CompanyID != 0 {
+			return errors.New("please choose either the company name to search or the company id")
+		}
 		return nil
 	},
 	Run: func(cmdCli *cobra.Command, args []string) {
@@ -36,6 +39,7 @@ func init() {
 	gatherCmd.Flags().BoolVar(&linkedinOptions.Email, "email", true, "Guess the email according to the format. If false print the first name and last name")
 	gatherCmd.Flags().BoolVarP(&linkedinOptions.ExactMatch, "exactMatch", "e", false, "Exact match of the company's name")
 	gatherCmd.Flags().StringVarP(&linkedinOptions.Cookie, "cookie", "s", "", "Session cookie named li_at")
-	gatherCmd.MarkFlagRequired("company")
+	gatherCmd.Flags().Int32VarP(&linkedinOptions.CompanyID, "companyID", "i", 0, "Company ID")
+	//gatherCmd.MarkFlagRequired("company")
 	gatherCmd.MarkFlagRequired("cookie")
 }

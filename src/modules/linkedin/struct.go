@@ -13,6 +13,7 @@ type Options struct {
 	Email      bool
 	ExactMatch bool
 	Cookie     string
+	CompanyID  int32
 	utils.BaseOptions
 }
 
@@ -237,4 +238,52 @@ type linkedinListPeople struct {
 		Start      int64         `json:"start"`
 		Total      int64         `json:"total"`
 	} `json:"paging"`
+}
+
+type linkedinGetCompany struct {
+	BasicCompanyInfo struct {
+		FollowingInfo struct {
+			DashFollowingStateUrn string `json:"dashFollowingStateUrn"`
+			EntityUrn             string `json:"entityUrn"`
+			Following             bool   `json:"following"`
+			FollowingType         string `json:"followingType"`
+			TrackingUrn           string `json:"trackingUrn"`
+		} `json:"followingInfo"`
+		Headquarters string `json:"headquarters"`
+		MiniCompany  struct {
+			Active         bool   `json:"active"`
+			DashCompanyUrn string `json:"dashCompanyUrn"`
+			EntityUrn      string `json:"entityUrn"`
+			Logo           struct {
+				Com_linkedin_common_VectorImage struct {
+					Artifacts []struct {
+						ExpiresAt                     int64  `json:"expiresAt"`
+						FileIdentifyingURLPathSegment string `json:"fileIdentifyingUrlPathSegment"`
+						Height                        int64  `json:"height"`
+						Width                         int64  `json:"width"`
+					} `json:"artifacts"`
+					RootURL string `json:"rootUrl"`
+				} `json:"com.linkedin.common.VectorImage"`
+			} `json:"logo"`
+			Name          string `json:"name"`
+			ObjectUrn     string `json:"objectUrn"`
+			Showcase      bool   `json:"showcase"`
+			TrackingID    string `json:"trackingId"`
+			UniversalName string `json:"universalName"`
+		} `json:"miniCompany"`
+	} `json:"basicCompanyInfo"`
+	CompanyType        string `json:"companyType"`
+	Description        string `json:"description"`
+	EmployeeCountRange string `json:"employeeCountRange"`
+	EntityInfo         struct {
+		ObjectUrn  string `json:"objectUrn"`
+		TrackingID string `json:"trackingId"`
+	} `json:"entityInfo"`
+	EntityUrn   string `json:"entityUrn"`
+	FoundedDate struct {
+		Year int64 `json:"year"`
+	} `json:"foundedDate"`
+	Industries  []string `json:"industries"`
+	Specialties []string `json:"specialties"`
+	WebsiteURL  string   `json:"websiteUrl"`
 }
