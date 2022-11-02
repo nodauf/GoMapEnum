@@ -12,10 +12,10 @@ import (
 )
 
 // getCompanyInfo return a struct that contains detailed information on a company
-func (options *Options) getCompanyInfo(compagnyID int) linkedinGetCompany {
+func (options *Options) getCompanyInfo(companyID int) linkedinGetCompany {
 	var company linkedinGetCompany
 
-	linkedinURL := fmt.Sprintf(LINKEDIN_GET_COMPANY_INFO, compagnyID)
+	linkedinURL := fmt.Sprintf(LINKEDIN_GET_COMPANY_INFO, companyID)
 	header := make(map[string]string)
 	header["csrf-token"] = "ajax:1337"
 	header["x-restli-protocol-version"] = "2.0.0"
