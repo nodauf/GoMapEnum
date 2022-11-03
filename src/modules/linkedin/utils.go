@@ -110,19 +110,23 @@ func (options *Options) getPeople(companyID, start int) []string {
 			}
 			// Parse the name to output in the specified format
 			name := strings.Split(people.Title.Text, " ")
-			// If the name is composed of more than 2 words or the email should not be guessed, we skip it
-			if len(name) == 2 && options.Email {
+			// If the name is composed of less than 2 words or the email should not be guessed, we skip it
+			if len(name) >= 2 && options.Email {
 				var email string
+				var last string
 				email = options.Format
+				last = strings.TrimRight(name[1], ",")
 				log.Verbose(name[0] + " - " + name[1])
 				email = strings.ReplaceAll(email, "{first}", name[0])
 				email = strings.ReplaceAll(email, "{f}", name[0][0:1])
-				email = strings.ReplaceAll(email, "{last}", name[1])
-				email = strings.ReplaceAll(email, "{l}", name[1][0:1])
+				email = strings.ReplaceAll(email, "{last}", last)
+				email = strings.ReplaceAll(email, "{l}", last[0:1])
+				email = strings.ReplaceAll(email, "{l2}", last[0:2])
 				email = strings.ToLower(unidecode.Unidecode(email))
 				log.Success(email + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text)
 				output = append(output, email)
 			}
+
 			if !options.Email {
 				result := people.Title.Text + " - " + people.PrimarySubtitle.Text + " - " + people.SecondarySubtitle.Text
 				log.Success(result)
