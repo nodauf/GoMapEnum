@@ -19,16 +19,36 @@ func (options *Options) Gather() string {
 	var output []string
 	log = options.Log
 	if options.CompanyID != 0 {
-		companyInfo := options.getCompanyInfo(int(options.CompanyID))
+		companyInfo, err := options.getCompanyInfo()
+		if err != nil {
+			if strings.Contains(err.Error(), "stopped after 10 redirects") {
+				log.Error("The session cookie may be wrong")
+			} else {
+				log.Error(err.Error())
+			}
+			return ""
+		}
 		options.Log.Verbose("Company name: %s Website: %s Description: %s", companyInfo.BasicCompanyInfo.MiniCompany.Name, companyInfo.WebsiteURL, companyInfo.Description)
 
-		output = options.getPeople(int(options.CompanyID), 0)
+		output, err = options.getPeople(int(options.CompanyID), 0)
+		if err != nil {
+			log.Error(err.Error())
+			return strings.Join(output, "\n")
+		}
 		log.Debug("Found " + strconv.Itoa(len(output)) + " peoples for " + companyInfo.BasicCompanyInfo.MiniCompany.Name)
 	} else {
 		// Always insensitive case compare
 		options.Company = strings.ToLower(options.Company)
 		// Get all the companies from the option
-		companies := options.getCompanies()
+		companies, err := options.getCompanies()
+		if err != nil {
+			if strings.Contains(err.Error(), "stopped after 10 redirects") {
+				log.Error("The session cookie may be wrong")
+			} else {
+				log.Error(err.Error())
+			}
+			return ""
+		}
 		log.Debug("Found " + strconv.Itoa(len(companies.Elements)) + " companies matching " + options.Company)
 		for _, company := range companies.Elements {
 			// Extract the company name from the struct
@@ -38,11 +58,24 @@ func (options *Options) Gather() string {
 			if company.EntityLockupView.TrackingUrn != "" && (!options.ExactMatch && strings.Contains(companyLinkedinName, options.Company) || options.ExactMatch && companyLinkedinName == options.Company) {
 				log.Verbose("Company name: " + companyLinkedinName + " match")
 				companyID, _ := strconv.Atoi(strings.Split(company.EntityLockupView.TrackingUrn, ":")[3])
-				companyInfo := options.getCompanyInfo(companyID)
+				companyInfo, err := options.getCompanyInfo()
+				if err != nil {
+					if strings.Contains(err.Error(), "stopped after 10 redirects") {
+						log.Error("The session cookie may be wrong")
+					} else {
+						log.Error(err.Error())
+					}
+					break
+				}
 				options.Log.Debug("Company name: %s Website: %s Description: %s", companyInfo.BasicCompanyInfo.MiniCompany.Name, companyInfo.WebsiteURL, companyInfo.Description)
 
 				// Get the people of the company, starting from 0
-				output = append(output, options.getPeople(companyID, 0)...)
+				peoples, err := options.getPeople(companyID, 0)
+				if err != nil {
+					log.Error(err.Error())
+					return strings.Join(output, "\n")
+				}
+				output = append(output, peoples...)
 				log.Debug("Found " + strconv.Itoa(len(output)) + " peoples for " + options.Company)
 			}
 		}
