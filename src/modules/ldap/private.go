@@ -138,7 +138,7 @@ func (options *Options) authenticate(username, password string) (bool, error) {
 	if err != nil {
 		// Enrich Invalid credentials error. Source: https://support.hcltechsw.com/csm?id=kb_article&sysparm_article=KB0012749
 		if ldap.IsErrorWithCode(err, ldap.LDAPResultInvalidCredentials) {
-			re, _ := regexp.Compile(".+ comment: AcceptSecurityContext error, data ([0-9a-fA-F]{1,3}), .+$")
+			re, _ := regexp.Compile(".+ comment: AcceptSecurityContext error, data ([0-9a-fA-F]{1,8}), .+$")
 			switch re.FindStringSubmatch(err.Error())[1] {
 			case "525":
 				err = fmt.Errorf("user not found")
@@ -169,6 +169,9 @@ func (options *Options) authenticate(username, password string) (bool, error) {
 				valid = true
 			case "775":
 				err = fmt.Errorf("user must reset password")
+				valid = false
+			case "80090346":
+				err = fmt.Errorf("channel binding is enforced")
 				valid = false
 			}
 		}
