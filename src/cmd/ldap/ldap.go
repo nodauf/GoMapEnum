@@ -80,6 +80,7 @@ func init() {
 
 	LdapCmd.AddCommand(bruteCmd)
 	LdapCmd.AddCommand(dumpCmd)
+	LdapCmd.AddCommand(checkRelayCmd)
 }
 
 func initLogger() {

@@ -1,6 +1,7 @@
 package ldap
 
 import (
+	"GoMapEnum/src/logger"
 	"GoMapEnum/src/utils"
 	"crypto/tls"
 	"fmt"
@@ -91,13 +92,13 @@ func establisheConnection(target, TLSMode string, timeout int, proxyTCP proxy.Di
 	var ldapConnection *ldap.Conn
 	switch strings.ToLower(TLSMode) {
 	case "tls":
-		tlsConn := tls.Client(conn, &tls.Config{InsecureSkipVerify: true})
+		tlsConn := tls.Client(conn, &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionTLS10})
 		ldapConnection = ldap.NewConn(tlsConn, true)
 		ldapConnection.Start()
 	case "starttls":
 		ldapConnection = ldap.NewConn(conn, false)
 		ldapConnection.Start()
-		err = ldapConnection.StartTLS(&tls.Config{InsecureSkipVerify: true})
+		err = ldapConnection.StartTLS(&tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionTLS10})
 
 	case "notls":
 		ldapConnection = ldap.NewConn(conn, false)
@@ -128,18 +129,23 @@ func executeLdapQuery(ldapConn *ldap.Conn, baseDN string, filterAndAttributs map
 
 func (options *Options) authenticate(username, password string) (bool, error) {
 	valid := false
-	options.Log.Verbose("Using domain " + options.Domain + " for authentication. Hostname: " + options.Hostname)
+	options.Log.Debug("Using domain " + options.Domain + " for authentication. Hostname: " + options.Hostname)
 	var err error
 	if options.UseNTLM {
 		err = options.authenticateNTLM(username, password, options.IsHash)
 	} else {
 		err = options.authenticateSimple(username, password)
 	}
+
 	if err != nil {
 		// Enrich Invalid credentials error. Source: https://support.hcltechsw.com/csm?id=kb_article&sysparm_article=KB0012749
 		if ldap.IsErrorWithCode(err, ldap.LDAPResultInvalidCredentials) {
-			re, _ := regexp.Compile(".+ comment: AcceptSecurityContext error, data ([0-9a-fA-F]{1,3}), .+$")
+			options.Log.Debug(err.Error())
+			re, _ := regexp.Compile(".+ comment: AcceptSecurityContext error, data ([0-9a-fA-F]{1,8}), .+$")
 			switch re.FindStringSubmatch(err.Error())[1] {
+			case "80090346":
+				err = fmt.Errorf("LDAP channel binding is enforced")
+				valid = true
 			case "525":
 				err = fmt.Errorf("user not found")
 				valid = false
@@ -226,4 +232,46 @@ func ParseLDAPData(allData interface{}, columns []string) [][]string {
 	}
 
 	return data
+}
+
+func isLDAPBindingEnforced(target string, log *logger.Logger, timeout int) (bool, error) {
+	var options Options
+	options.TLS = "TLS"
+	options.Target = target
+	options.Log = log
+	options.UseNTLM = true
+	options.Timeout = timeout
+	_, err := options.authenticate("guest", "")
+
+	if err != nil && strings.Contains(err.Error(), "connection reset by peer") {
+		return false, fmt.Errorf("Something is wrong with LDAPS (maybe an issue with the certificate on the ldap server, missing certificate or whatever)")
+	}
+	if err != nil && strings.Contains(err.Error(), "timeout") {
+		return false, fmt.Errorf("Server does not seem reachable: %s", err.Error())
+	}
+	if err == nil {
+		defer options.ldapConn.Close()
+	}
+	return err != nil && strings.Contains(err.Error(), "channel binding is enforced"), nil
+}
+
+func isLDAPSigningRequired(target, username, password string, log *logger.Logger, timeout int) (bool, error) {
+	var options Options
+	options.TLS = "NoTLS"
+	options.Target = target
+	options.Log = log
+	options.UseNTLM = true
+	options.Timeout = timeout
+	_, err := options.authenticate(username, password)
+	if err == nil {
+		defer options.ldapConn.Close()
+	}
+	if ldap.IsErrorWithCode(err, ldap.LDAPResultInvalidCredentials) {
+		// return a bool but we don't know
+		return true, fmt.Errorf("credential are invalid. Cannot check for ldap signing")
+	}
+	if err != nil && strings.Contains(err.Error(), "timeout") {
+		return false, fmt.Errorf("Server does not seem reachable: %s", err.Error())
+	}
+	return err != nil && ldap.IsErrorWithCode(err, ldap.LDAPResultStrongAuthRequired), nil
 }
