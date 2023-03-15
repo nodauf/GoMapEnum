@@ -3,6 +3,7 @@ package cmd
 import (
 	"GoMapEnum/src/cmd/adfs"
 	"GoMapEnum/src/cmd/azure"
+	"GoMapEnum/src/cmd/google"
 	"GoMapEnum/src/cmd/kerberos"
 	"GoMapEnum/src/cmd/ldap"
 	"GoMapEnum/src/cmd/linkedin"
@@ -42,6 +43,7 @@ func init() {
 	// New module
 	rootCmd.AddCommand(azure.AzureCmd)
 	rootCmd.AddCommand(adfs.AdfsCmd)
+	rootCmd.AddCommand(google.GoogleCmd)
 	rootCmd.AddCommand(ldap.LdapCmd)
 	rootCmd.AddCommand(linkedin.LinkedinCmd)
 	rootCmd.AddCommand(kerberos.KerberosCmd)
