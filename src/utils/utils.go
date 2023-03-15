@@ -3,11 +3,13 @@ package utils
 import (
 	templateResources "GoMapEnum/src/template"
 	"bytes"
+	"context"
 	"crypto/hmac"
 	"crypto/md5"
 	"crypto/rc4"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"net"
@@ -20,11 +22,57 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/rs/dnscache"
 	"golang.org/x/net/proxy"
 )
 
 func init() {
+}
+
+var Transporter *http.Transport
+
+func init() {
+
 	rand.Seed(time.Now().UnixNano())
+
+	/*
+		'High performance' http transport for golang
+		increases MaxIdleConns and conns per host since we expect
+		to be talking to a lot of other hosts all the time
+		Also adds a basic in-process dns cache to help
+		in docker environments since the standard alpine build appears
+		to have no in container dns cache
+	*/
+	r := &dnscache.Resolver{}
+	Transporter = &http.Transport{
+
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		DialContext: func(ctx context.Context, network string, addr string) (conn net.Conn, err error) {
+			separator := strings.LastIndex(addr, ":")
+			ips, err := r.LookupHost(ctx, addr[:separator])
+			if err != nil {
+				return nil, err
+			}
+			for _, ip := range ips {
+				conn, err = net.Dial(network, ip+addr[separator:])
+				if err == nil {
+					break
+				}
+			}
+			return
+		},
+		MaxIdleConns:    1024,
+		MaxConnsPerHost: 100,
+		IdleConnTimeout: 10 * time.Second,
+	}
+	go func() {
+		clearUnused := true
+		t := time.NewTicker(5 * time.Minute)
+		defer t.Stop()
+		for range t.C {
+			r.Refresh(clearUnused)
+		}
+	}()
 }
 
 // GetStringOrFile return the content of the file if it is a file otherwise return the string
@@ -112,28 +160,29 @@ func ReSubMatchMap(r *regexp.Regexp, str string) map[string]string {
 }
 
 // GetBodyInWebsite return the body of the website
-func GetBodyInWebsite(url string, proxy func(*http.Request) (*url.URL, error), headers map[string]string) (string, int, error) {
+func GetBodyInWebsite(url string, proxy func(*http.Request) (*url.URL, error), headers map[string]string, bodyRequest io.Reader) (string, int, error) {
 	// Get random user agent
 	userAgent := GetUserAgent()
-	req, _ := http.NewRequest("GET", url, nil)
+	var req *http.Request
+	if bodyRequest == nil {
+		req, _ = http.NewRequest("GET", url, nil)
+	} else {
+		req, _ = http.NewRequest("POST", url, bodyRequest)
+	}
 	req.Header.Add("User-Agent", userAgent)
 	// Add the headers to the request
 	for headerName, headerValue := range headers {
 		req.Header.Add(headerName, headerValue)
 	}
-
+	Transporter.Proxy = proxy
 	client := &http.Client{
-
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           proxy,
-		},
+		Transport: Transporter,
 	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", -1, err
 	}
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	return string(body), resp.StatusCode, nil
 }

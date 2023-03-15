@@ -22,7 +22,6 @@ type BaseOptions struct {
 	Sleep         int
 	Target        string
 	CheckIfValid  bool
-	Company       string
 	ProxyHTTP     func(*http.Request) (*url.URL, error)
 	ProxyTCP      proxy.Dialer
 	Mutex         sync.Mutex

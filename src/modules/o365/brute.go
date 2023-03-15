@@ -32,6 +32,7 @@ func PrepareOptions(optionsInterface *interface{}) interface{} {
 // Authenticate will be called to test an authentication and use the specified mode and check the lockout
 func Authenticate(optionsInterface *interface{}, email, password string) bool {
 	options := (*optionsInterface).(*Options)
+	options.Mode = "oauth2"
 	var valid bool
 	var err error
 	switch options.Mode {

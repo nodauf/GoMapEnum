@@ -12,5 +12,6 @@ type Options struct {
 	Format       string
 	ExactMatch   bool
 	SearchEngine string
+	Company      string
 	utils.BaseOptions
 }

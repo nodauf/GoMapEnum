@@ -53,7 +53,7 @@ func (options *Options) Gather() string {
 			url := fmt.Sprintf(formatUrl, options.Company, startSearch)
 			log.Debug("URL: " + url)
 			// Get the results of the search
-			body, statusCode, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, nil)
+			body, statusCode, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, nil, nil)
 			if err != nil {
 				log.Error(err.Error())
 				continue

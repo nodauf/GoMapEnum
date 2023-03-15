@@ -20,7 +20,7 @@ func (options *Options) getCompanyInfo() (linkedinGetCompany, error) {
 	header["csrf-token"] = "ajax:1337"
 	header["x-restli-protocol-version"] = "2.0.0"
 	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
-	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header)
+	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header, nil)
 	if err != nil {
 		return company, err
 	}
@@ -45,7 +45,7 @@ func (options *Options) getCompanies() (linkedinListCompany, error) {
 	header["csrf-token"] = "ajax:1337"
 	header["x-restli-protocol-version"] = "2.0.0"
 	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
-	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header)
+	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header, nil)
 	if err != nil {
 		return companies, err
 	}
@@ -69,7 +69,7 @@ func (options *Options) getPeople(companyID, start int) ([]string, error) {
 	header["x-restli-protocol-version"] = "2.0.0"
 	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
 
-	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header)
+	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header, nil)
 	if err != nil {
 		return output, err
 	}

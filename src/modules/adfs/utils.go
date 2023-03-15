@@ -85,7 +85,7 @@ func (options *Options) brute(username, password string) bool {
 func (options *Options) findTarget(domain string) string {
 	var target string
 	url := fmt.Sprintf(FIND_ADFS_URL, domain)
-	body, _, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, nil)
+	body, _, err := utils.GetBodyInWebsite(url, options.ProxyHTTP, nil, nil)
 	if err != nil {
 		options.Log.Error(err.Error())
 		return ""

@@ -7,13 +7,14 @@ import (
 
 var log *logger.Logger
 
-// Options for o365 module
+// Options for linkedin module
 type Options struct {
 	Format     string
 	Email      bool
 	ExactMatch bool
 	Cookie     string
 	CompanyID  int32
+	Company    string
 	utils.BaseOptions
 }
 

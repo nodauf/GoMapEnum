@@ -333,7 +333,7 @@ func dumpO365ObjectPaging(url string, proxy func(*http.Request) (*url.URL, error
 	var allResults genericStruct
 	for url != "" {
 		var tempResult genericStruct
-		jsonData, statusCode, err := utils.GetBodyInWebsite(url, proxy, headers)
+		jsonData, statusCode, err := utils.GetBodyInWebsite(url, proxy, headers, nil)
 		if err != nil {
 			return "", fmt.Errorf("cannot request the URL %s, error %s (status code: %d)", url, err.Error(), statusCode)
 		}
