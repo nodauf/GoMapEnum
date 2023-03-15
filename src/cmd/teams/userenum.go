@@ -15,7 +15,7 @@ var enumCmd = &cobra.Command{
 	Long: `Users can be enumerated on Microsoft Teams with the search features.
 it will validates an email address or a list of email addresses.
 If these emails exist the presence of the user is retrieved as well as the device used to connect`,
-	Example: `go run main.go userenum teams -t "eyJ0..." -e emails -o validUsers`,
+	Example: `go run main.go teams userenum -t "eyJ0..." -e emails -o validUsers`,
 	Run: func(cmdCli *cobra.Command, args []string) {
 		log := logger.New("Enumeration", "Teams", teamsOptions.Target)
 		log.SetLevel(level)
