@@ -174,8 +174,8 @@ func (options *Options) authenticate(username, password string) (bool, error) {
 				err = fmt.Errorf("user must reset password")
 				valid = false
 			case "80090346":
-				err = fmt.Errorf("channel binding is enforced")
-				valid = false
+				err = fmt.Errorf("LDAP channel binding is enforced")
+				valid = true
 			}
 		}
 
