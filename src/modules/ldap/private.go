@@ -143,9 +143,6 @@ func (options *Options) authenticate(username, password string) (bool, error) {
 			options.Log.Debug(err.Error())
 			re, _ := regexp.Compile(".+ comment: AcceptSecurityContext error, data ([0-9a-fA-F]{1,8}), .+$")
 			switch re.FindStringSubmatch(err.Error())[1] {
-			case "80090346":
-				err = fmt.Errorf("LDAP channel binding is enforced")
-				valid = true
 			case "525":
 				err = fmt.Errorf("user not found")
 				valid = false

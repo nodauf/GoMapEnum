@@ -12,6 +12,7 @@ require (
 	github.com/nodauf/go-smb2 v1.0.15
 	github.com/nodauf/gokrb5/v8 v8.4.3
 	github.com/nodauf/net-smtp v0.0.0-20220123142515-ae3aa26fb163
+	github.com/rs/dnscache v0.0.0-20211102005908-e0241e321417 // indirect
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
