@@ -26,7 +26,7 @@ func (options *Options) getCompanyInfo() (linkedinGetCompany, error) {
 	}
 	if statusCode != 200 {
 		log.Debug(body)
-		return company, fmt.Errorf("something went wrong. Status code %d != 200: %s", statusCode, err.Error())
+		return company, fmt.Errorf("something went wrong. Status code %d != 200", statusCode)
 	}
 	err = json.Unmarshal([]byte(body), &company)
 	if err != nil {
