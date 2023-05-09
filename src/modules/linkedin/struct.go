@@ -82,162 +82,135 @@ type linkedinListCompany struct {
 
 type linkedinListPeople struct {
 	Elements []struct {
-		RecipeType   string `json:"$recipeType"`
-		FeatureUnion struct {
-			SimpleText struct {
-				RecipeType    string        `json:"$recipeType"`
-				AttributesV2  []interface{} `json:"attributesV2"`
-				Text          string        `json:"text"`
-				TextDirection string        `json:"textDirection"`
-			} `json:"simpleText"`
-		} `json:"featureUnion"`
-		Results []struct {
-			RecipeType               string `json:"$recipeType"`
-			AddEntityToSearchHistory bool   `json:"addEntityToSearchHistory"`
-			BadgeText                struct {
-				RecipeType        string        `json:"$recipeType"`
-				AccessibilityText string        `json:"accessibilityText"`
-				AttributesV2      []interface{} `json:"attributesV2"`
-				Text              string        `json:"text"`
-				TextDirection     string        `json:"textDirection"`
-			} `json:"badgeText"`
-			EntityCustomTrackingInfo struct {
-				RecipeType     string `json:"$recipeType"`
-				MemberDistance string `json:"memberDistance"`
-				NameMatch      bool   `json:"nameMatch"`
-			} `json:"entityCustomTrackingInfo"`
-			EntityUrn string `json:"entityUrn"`
-			Image     struct {
-				RecipeType        string `json:"$recipeType"`
-				AccessibilityText string `json:"accessibilityText"`
-				Attributes        []struct {
-					RecipeType string `json:"$recipeType"`
-					DetailData struct {
-						ProfilePicture struct {
-							AntiAbuseAnnotations []struct {
-								AttributeID int64 `json:"attributeId"`
-								EntityID    int64 `json:"entityId"`
-							} `json:"$anti_abuse_annotations"`
-							RecipeType     string `json:"$recipeType"`
-							EntityUrn      string `json:"entityUrn"`
-							ProfilePicture struct {
-								RecipeType            string `json:"$recipeType"`
-								DisplayImageReference struct {
-									VectorImage struct {
-										RecipeType string `json:"$recipeType"`
-										Artifacts  []struct {
-											RecipeType                    string `json:"$recipeType"`
-											ExpiresAt                     int64  `json:"expiresAt"`
-											FileIdentifyingURLPathSegment string `json:"fileIdentifyingUrlPathSegment"`
-											Height                        int64  `json:"height"`
-											Width                         int64  `json:"width"`
-										} `json:"artifacts"`
-										RootURL string `json:"rootUrl"`
-									} `json:"vectorImage"`
-								} `json:"displayImageReference"`
-							} `json:"profilePicture"`
-						} `json:"profilePicture"`
-					} `json:"detailData"`
-					DetailDataUnion struct {
-						ProfilePicture string `json:"profilePicture"`
-					} `json:"detailDataUnion"`
-				} `json:"attributes"`
-			} `json:"image"`
-			Insights []struct {
-				SimpleInsight struct {
-					RecipeType string `json:"$recipeType"`
-					Image      struct {
-						RecipeType string `json:"$recipeType"`
-						Attributes []struct {
-							RecipeType string `json:"$recipeType"`
-							DetailData struct {
-								ProfilePicture struct {
-									AntiAbuseAnnotations []struct {
-										AttributeID int64 `json:"attributeId"`
-										EntityID    int64 `json:"entityId"`
-									} `json:"$anti_abuse_annotations"`
-									RecipeType     string `json:"$recipeType"`
-									EntityUrn      string `json:"entityUrn"`
-									ProfilePicture struct {
-										RecipeType            string `json:"$recipeType"`
-										DisplayImageReference struct {
-											VectorImage struct {
-												RecipeType string `json:"$recipeType"`
-												Artifacts  []struct {
-													RecipeType                    string `json:"$recipeType"`
-													ExpiresAt                     int64  `json:"expiresAt"`
-													FileIdentifyingURLPathSegment string `json:"fileIdentifyingUrlPathSegment"`
-													Height                        int64  `json:"height"`
-													Width                         int64  `json:"width"`
-												} `json:"artifacts"`
-												RootURL string `json:"rootUrl"`
-											} `json:"vectorImage"`
-										} `json:"displayImageReference"`
-									} `json:"profilePicture"`
-								} `json:"profilePicture"`
-							} `json:"detailData"`
+		_RecipeType string `json:"$recipeType"`
+		Items       []struct {
+			_RecipeType string `json:"$recipeType"`
+			ItemUnion   struct {
+				EntityResult struct {
+					_RecipeType              string `json:"$recipeType"`
+					AddEntityToSearchHistory bool   `json:"addEntityToSearchHistory"`
+					BadgeText                struct {
+						_RecipeType       string        `json:"$recipeType"`
+						AccessibilityText string        `json:"accessibilityText"`
+						AttributesV2      []interface{} `json:"attributesV2"`
+						Text              string        `json:"text"`
+						TextDirection     string        `json:"textDirection"`
+					} `json:"badgeText"`
+					EntityCustomTrackingInfo struct {
+						_RecipeType    string `json:"$recipeType"`
+						MemberDistance string `json:"memberDistance"`
+						NameMatch      bool   `json:"nameMatch"`
+					} `json:"entityCustomTrackingInfo"`
+					EntityUrn string `json:"entityUrn"`
+					Image     struct {
+						_RecipeType       string `json:"$recipeType"`
+						AccessibilityText string `json:"accessibilityText"`
+						Attributes        []struct {
+							_RecipeType     string `json:"$recipeType"`
 							DetailDataUnion struct {
-								ProfilePicture string `json:"profilePicture"`
+								NonEntityProfilePicture struct {
+									_RecipeType string `json:"$recipeType"`
+									Profile     struct {
+										_RecipeType string `json:"$recipeType"`
+										EntityUrn   string `json:"entityUrn"`
+									} `json:"profile"`
+									ProfileUrn string `json:"profileUrn"`
+								} `json:"nonEntityProfilePicture"`
 							} `json:"detailDataUnion"`
 						} `json:"attributes"`
 					} `json:"image"`
-					NavigationURL    string `json:"navigationUrl"`
-					SearchActionType string `json:"searchActionType"`
-					Title            struct {
-						RecipeType    string        `json:"$recipeType"`
+					Insights []struct {
+						SimpleInsight struct {
+							_RecipeType string `json:"$recipeType"`
+							Image       struct {
+								_RecipeType string `json:"$recipeType"`
+								Attributes  []struct {
+									_RecipeType     string `json:"$recipeType"`
+									DetailDataUnion struct {
+										NonEntityProfilePicture struct {
+											_RecipeType string `json:"$recipeType"`
+											Profile     struct {
+												_RecipeType string `json:"$recipeType"`
+												EntityUrn   string `json:"entityUrn"`
+											} `json:"profile"`
+											ProfileUrn  string `json:"profileUrn"`
+											VectorImage struct {
+												_RecipeType string `json:"$recipeType"`
+												Artifacts   []struct {
+													_RecipeType                   string `json:"$recipeType"`
+													ExpiresAt                     int    `json:"expiresAt"`
+													FileIdentifyingUrlPathSegment string `json:"fileIdentifyingUrlPathSegment"`
+													Height                        int    `json:"height"`
+													Width                         int    `json:"width"`
+												} `json:"artifacts"`
+												RootUrl string `json:"rootUrl"`
+											} `json:"vectorImage"`
+										} `json:"nonEntityProfilePicture"`
+									} `json:"detailDataUnion"`
+								} `json:"attributes"`
+							} `json:"image"`
+							NavigationUrl    string `json:"navigationUrl"`
+							SearchActionType string `json:"searchActionType"`
+							Title            struct {
+								_RecipeType   string        `json:"$recipeType"`
+								AttributesV2  []interface{} `json:"attributesV2"`
+								Text          string        `json:"text"`
+								TextDirection string        `json:"textDirection"`
+							} `json:"title"`
+						} `json:"simpleInsight"`
+					} `json:"insights"`
+					LazyLoadedActions struct {
+						_RecipeType string `json:"$recipeType"`
+						EntityUrn   string `json:"entityUrn"`
+					} `json:"lazyLoadedActions"`
+					LazyLoadedActionsUrn string `json:"lazyLoadedActionsUrn"`
+					NavigationContext    struct {
+						_RecipeType string `json:"$recipeType"`
+						Url         string `json:"url"`
+					} `json:"navigationContext"`
+					NavigationUrl   string `json:"navigationUrl"`
+					PrimarySubtitle struct {
+						_RecipeType   string        `json:"$recipeType"`
 						AttributesV2  []interface{} `json:"attributesV2"`
 						Text          string        `json:"text"`
 						TextDirection string        `json:"textDirection"`
+					} `json:"primarySubtitle"`
+					SecondarySubtitle struct {
+						_RecipeType   string        `json:"$recipeType"`
+						AttributesV2  []interface{} `json:"attributesV2"`
+						Text          string        `json:"text"`
+						TextDirection string        `json:"textDirection"`
+					} `json:"secondarySubtitle"`
+					Title struct {
+						_RecipeType       string        `json:"$recipeType"`
+						AccessibilityText string        `json:"accessibilityText"`
+						AttributesV2      []interface{} `json:"attributesV2"`
+						Text              string        `json:"text"`
+						TextDirection     string        `json:"textDirection"`
 					} `json:"title"`
-				} `json:"simpleInsight"`
-			} `json:"insights"`
-			LazyLoadedActions struct {
-				RecipeType string `json:"$recipeType"`
-				EntityUrn  string `json:"entityUrn"`
-			} `json:"lazyLoadedActions"`
-			LazyLoadedActionsUrn string `json:"lazyLoadedActionsUrn"`
-			NavigationContext    struct {
-				RecipeType string `json:"$recipeType"`
-				URL        string `json:"url"`
-			} `json:"navigationContext"`
-			NavigationURL   string `json:"navigationUrl"`
-			PrimarySubtitle struct {
-				RecipeType    string        `json:"$recipeType"`
-				AttributesV2  []interface{} `json:"attributesV2"`
-				Text          string        `json:"text"`
-				TextDirection string        `json:"textDirection"`
-			} `json:"primarySubtitle"`
-			SecondarySubtitle struct {
-				RecipeType    string        `json:"$recipeType"`
-				AttributesV2  []interface{} `json:"attributesV2"`
-				Text          string        `json:"text"`
-				TextDirection string        `json:"textDirection"`
-			} `json:"secondarySubtitle"`
-			Title struct {
-				RecipeType        string        `json:"$recipeType"`
-				AccessibilityText string        `json:"accessibilityText"`
-				AttributesV2      []interface{} `json:"attributesV2"`
-				Text              string        `json:"text"`
-				TextDirection     string        `json:"textDirection"`
-			} `json:"title"`
-			TrackingID  string `json:"trackingId"`
-			TrackingUrn string `json:"trackingUrn"`
-		} `json:"results"`
+					TrackingId  string `json:"trackingId"`
+					TrackingUrn string `json:"trackingUrn"`
+				} `json:"entityResult"`
+			} `json:"itemUnion"`
+			Position int `json:"position"`
+		} `json:"items"`
+		Position   int    `json:"position"`
+		TrackingId string `json:"trackingId"`
 	} `json:"elements"`
 	Metadata struct {
-		RecipeType         string `json:"$recipeType"`
+		_RecipeType        string `json:"$recipeType"`
 		BlockedQuery       bool   `json:"blockedQuery"`
-		FilterAppliedCount int64  `json:"filterAppliedCount"`
+		FilterAppliedCount int    `json:"filterAppliedCount"`
 		PrimaryResultType  string `json:"primaryResultType"`
-		SearchID           string `json:"searchId"`
-		TotalResultCount   int64  `json:"totalResultCount"`
+		SearchId           string `json:"searchId"`
+		TotalResultCount   int    `json:"totalResultCount"`
 	} `json:"metadata"`
 	Paging struct {
-		RecipeType string        `json:"$recipeType"`
-		Count      int64         `json:"count"`
-		Links      []interface{} `json:"links"`
-		Start      int64         `json:"start"`
-		Total      int64         `json:"total"`
+		_RecipeType string        `json:"$recipeType"`
+		Count       int           `json:"count"`
+		Links       []interface{} `json:"links"`
+		Start       int           `json:"start"`
+		Total       int           `json:"total"`
 	} `json:"paging"`
 }
 
