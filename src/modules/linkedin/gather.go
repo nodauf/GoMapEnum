@@ -58,6 +58,7 @@ func (options *Options) Gather() string {
 			if company.EntityLockupView.TrackingUrn != "" && (!options.ExactMatch && strings.Contains(companyLinkedinName, options.Company) || options.ExactMatch && companyLinkedinName == options.Company) {
 				log.Verbose("Company name: " + companyLinkedinName + " match")
 				companyID, _ := strconv.Atoi(strings.Split(company.EntityLockupView.TrackingUrn, ":")[3])
+				options.CompanyID = int32(companyID)
 				companyInfo, err := options.getCompanyInfo()
 				if err != nil {
 					if strings.Contains(err.Error(), "stopped after 10 redirects") {

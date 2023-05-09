@@ -16,6 +16,9 @@ func init() {
 
 // TestGetCompanyInfo test the function getCompanyInfo to check the LinkedIn API is not being updated
 func TestGetCompanyInfo(t *testing.T) {
+	log := logger.New("test", "linkedin", "Linkedin")
+	log.SetLevel(logger.DebugLevel)
+	options.Log = log
 	options.CompanyID = 11452158
 	name := "Contoso"
 	websiteURL := "http://www.contoso.org"
@@ -50,6 +53,9 @@ func TestGetCompanyInfo(t *testing.T) {
 
 // TestGetCompanies test the function getCompanies to check the LinkedIn API is not being updated
 func TestGetCompanies(t *testing.T) {
+	log := logger.New("test", "linkedin", "Linkedin")
+	log.SetLevel(logger.DebugLevel)
+	options.Log = log
 	options.Company = "contos"
 	companyName := "contoso"
 	companyID := "urn:li:company:11452158"
@@ -84,15 +90,14 @@ func TestGetCompanies(t *testing.T) {
 
 // TestGetPeople test the function getPeople to check the LinkedIn API is not being updated
 func TestGetPeople(t *testing.T) {
+	log := logger.New("test", "linkedin", "Linkedin")
+	log.SetLevel(logger.DebugLevel)
+	options.Log = log
 	options.Company = "contoso"
 	options.Format = "{first}.{last}@contoso.com"
 	options.Email = true
 	peopleEmail := "kurt.shintaku@contoso.com"
 	companyID := 11452158
-	logx := logger.New("x", "x", "x")
-	logx.NoColor = false
-	logx.SetLevel(logger.ErrorLevel)
-	options.Log = logx
 
 	if options.Cookie == "" {
 		t.Error("Argument cookie is not set. Cannot execute test on linkedin module")
