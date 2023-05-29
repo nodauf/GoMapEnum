@@ -26,6 +26,8 @@ go run main.go owa brute -u john.doe@contoso.com -p Automn2021! -t mail.contoso.
 		orchestratorOptions := orchestrator.Orchestrator{}
 		orchestratorOptions.PreActionBruteforce = owa.PrepareBruteforce
 		orchestratorOptions.CustomOptionsForCheckIfValid = owa.PrepareOptions
+		orchestratorOptions.PreActionUserEnum = owa.InitAndAverageResponseTime
+		orchestratorOptions.UserEnumFunc = owa.UserEnum
 		validUsers = orchestratorOptions.Bruteforce(&owaOptions)
 
 	},
