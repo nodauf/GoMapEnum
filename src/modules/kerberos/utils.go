@@ -179,7 +179,7 @@ func handleKerbError(err error) (bool, string) {
 	// Revoked can be a lot of different errors. The error have be enrich
 	if strings.Contains(eString, "KDC_ERR_CLIENT_REVOKED") {
 		// If the error has detailed information
-		if strings.Split(eString, "-")[1] != "" {
+		if len(strings.Split(eString, "-")) > 0 && strings.Split(eString, "-")[1] != "" {
 			return true, strings.TrimSpace(strings.Split(eString, "-")[1])
 		}
 		return true, "USER LOCKED OUT"
