@@ -102,6 +102,7 @@ func (options *Options) enumOffice(email string) bool {
 	resp, err := client.Do(req)
 	if err != nil {
 		options.Log.Error("Error on response.\n[ERRO] - " + err.Error())
+		return exist
 	}
 	if resp.StatusCode == 200 {
 		body, _ := ioutil.ReadAll(resp.Body)
