@@ -1,4 +1,6 @@
 [![Goland card](https://goreportcard.com/badge/github.com/nodauf/GoMapEnum)](https://goreportcard.com/report/github.com/nodauf/GoMapEnum)
+
+_This project was originally written to learn Golang and explore the different ways I've encountered when pentesting to enumerate or brute force users and write them together. If you have any errors, feel free to create an issue and I'll do my best to fix them or improve the tools._
 # GoMapEnum
 
 Nothing new but existing techniques are brought together in one tool.
