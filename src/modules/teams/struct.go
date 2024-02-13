@@ -6,7 +6,8 @@ import (
 
 // Options for teams module
 type Options struct {
-	Token string
+	Token           string
+	TenantIsPrivate utils.LockedMapBool
 	utils.BaseOptions
 }
 
