@@ -38,10 +38,8 @@ func init() {
 	gatherCmd.Flags().StringVarP(&linkedinOptions.Company, "company", "c", "", "Company name")
 	gatherCmd.Flags().BoolVar(&linkedinOptions.Email, "email", true, "Guess the email according to the format. If false print the first name and last name")
 	gatherCmd.Flags().BoolVarP(&linkedinOptions.ExactMatch, "exactMatch", "e", false, "Exact match of the company's name")
-	gatherCmd.Flags().StringVarP(&linkedinOptions.CookieSession, "session", "s", "", "Session cookie named li_at")
-	gatherCmd.Flags().StringVarP(&linkedinOptions.CookieCSRF, "csrf", "r", "", "Session cookie named JSESSIONID")
+	gatherCmd.Flags().StringVarP(&linkedinOptions.Cookie, "cookie", "s", "", "Session cookie named li_at")
 	gatherCmd.Flags().Int32VarP(&linkedinOptions.CompanyID, "companyID", "i", 0, "Company ID")
 	//gatherCmd.MarkFlagRequired("company")
-	gatherCmd.MarkFlagRequired("session")
-	gatherCmd.MarkFlagRequired("csrf")
+	gatherCmd.MarkFlagRequired("cookie")
 }

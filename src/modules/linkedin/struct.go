@@ -9,13 +9,12 @@ var log *logger.Logger
 
 // Options for linkedin module
 type Options struct {
-	Format        string
-	Email         bool
-	ExactMatch    bool
-	CookieSession string
-	CookieCSRF    string
-	CompanyID     int32
-	Company       string
+	Format     string
+	Email      bool
+	ExactMatch bool
+	Cookie     string
+	CompanyID  int32
+	Company    string
 	utils.BaseOptions
 }
 
