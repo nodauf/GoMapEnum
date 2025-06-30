@@ -44,9 +44,14 @@ func UserEnum(optionsInterface *interface{}, username string) bool {
 		if err != nil {
 			options.Log.Error("Error on response.\n[ERRO] - " + err.Error())
 		}
-		if resp.StatusCode == 200 {
+		var jsonInterface interface{}
+		body, _ := ioutil.ReadAll(resp.Body)
+		json.Unmarshal([]byte(body), &jsonInterface)
+		if resp.StatusCode == 200 && reflect.ValueOf(jsonInterface).Len() > 0 {
+			options.Log.Debug("Tenant is private")
 			options.TenantIsPrivate.Set(tenant, true)
 		} else {
+			options.Log.Debug("Tenant is not private")
 			options.TenantIsPrivate.Set(tenant, false)
 
 		}
