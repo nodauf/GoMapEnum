@@ -10,7 +10,7 @@ import (
 var options Options
 
 func init() {
-	flag.StringVar(&options.Cookie, "cookie", "", "Session cookie named li_at")
+	flag.StringVar(&options.CookieSession, "cookie", "", "Session cookie named li_at")
 
 }
 
@@ -24,7 +24,7 @@ func TestGetCompanyInfo(t *testing.T) {
 	websiteURL := "http://www.contoso.org"
 	description := "Contoso Ltd. (also known as Contoso and Contoso University) is a fictional company used by Microsoft as an example company and domain."
 
-	if options.Cookie == "" {
+	if options.CookieSession == "" {
 		t.Error("Argument cookie is not set. Cannot execute test on linkedin module")
 		return
 	}
@@ -60,7 +60,7 @@ func TestGetCompanies(t *testing.T) {
 	companyName := "contoso"
 	companyID := "urn:li:company:11452158"
 
-	if options.Cookie == "" {
+	if options.CookieSession == "" {
 		t.Error("Argument cookie is not set. Cannot execute test on linkedin module")
 		return
 	}
@@ -99,7 +99,7 @@ func TestGetPeople(t *testing.T) {
 	peopleEmail := "kurt.shintaku@contoso.com"
 	companyID := 11452158
 
-	if options.Cookie == "" {
+	if options.CookieSession == "" {
 		t.Error("Argument cookie is not set. Cannot execute test on linkedin module")
 		return
 	}

@@ -17,9 +17,9 @@ func (options *Options) getCompanyInfo() (linkedinGetCompany, error) {
 
 	linkedinURL := fmt.Sprintf(LINKEDIN_GET_COMPANY_INFO, options.CompanyID)
 	header := make(map[string]string)
-	header["csrf-token"] = "ajax:1337"
+	header["csrf-token"] = options.CookieCSRF
 	header["x-restli-protocol-version"] = "2.0.0"
-	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
+	header["cookie"] = "JSESSIONID=" + options.CookieCSRF + "; li_at=" + options.CookieSession + ";"
 	options.Log.Debug("request to %s", linkedinURL)
 	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header, nil)
 	if err != nil {
@@ -43,9 +43,9 @@ func (options *Options) getCompanies() (linkedinListCompany, error) {
 
 	linkedinURL := fmt.Sprintf(LINKEDIN_LIST_COMPANY, url.QueryEscape(options.Company))
 	header := make(map[string]string)
-	header["csrf-token"] = "ajax:1337"
+	header["csrf-token"] = options.CookieCSRF
 	header["x-restli-protocol-version"] = "2.0.0"
-	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
+	header["cookie"] = "JSESSIONID=" + options.CookieCSRF + "; li_at=" + options.CookieSession + ";"
 	options.Log.Debug("request to %s", linkedinURL)
 	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header, nil)
 	if err != nil {
@@ -68,9 +68,9 @@ func (options *Options) getPeople(companyID, start int) ([]string, error) {
 	var output []string
 	linkedinURL := fmt.Sprintf(LINKEDIN_LIST_PEOPLE, companyID, start)
 	header := make(map[string]string)
-	header["csrf-token"] = "ajax:1337"
+	header["csrf-token"] = options.CookieCSRF
 	header["x-restli-protocol-version"] = "2.0.0"
-	header["cookie"] = "JSESSIONID='ajax:1337'; li_at=" + options.Cookie + ";"
+	header["cookie"] = "JSESSIONID=" + options.CookieCSRF + "; li_at=" + options.CookieSession + ";"
 	options.Log.Debug("request to %s", linkedinURL)
 	body, statusCode, err := utils.GetBodyInWebsite(linkedinURL, options.ProxyHTTP, header, nil)
 	if err != nil {

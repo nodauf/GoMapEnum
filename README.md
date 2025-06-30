@@ -19,7 +19,7 @@ The company will be searched on Linkedin and all people working at these compani
 
 _Note that no profile will be viewed and therefore the user will not receive any notification._
 
-The Linkedin's session cookie `li_at` is required.
+The Linkedin's session cookie`li_at` and `JSESSIONID` are required.
 
 ![User enumeration on owa](./images/linkedin-gather.png)
 
